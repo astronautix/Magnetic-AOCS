@@ -4,4 +4,8 @@
 ```bash
 pip3 install -r requirements.txt
 ```
-tst
+
+## Lancement
+```bash
+python3 simulation/visualisation.py
+```
