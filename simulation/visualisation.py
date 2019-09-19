@@ -1,0 +1,33 @@
+from simulator import Simulator
+import vpython as vp
+from math import *
+import numpy as np
+
+ux = vp.vector(1,0,0)
+uy = vp.vector(0,1,0)
+uz = vp.vector(0,0,1)
+
+# trièdre (z,x,y)
+axe_x = vp.arrow(pos=vp.vector(0,0,0), axis=10*ux, shaftwidth=0.1)
+axe_y = vp.arrow(pos=vp.vector(0,0,0), axis=10*uy, shaftwidth=0.1)
+axe_z = vp.arrow(pos=vp.vector(0,0,0), axis=10*uz, shaftwidth=0.1)
+
+wx, wy, wz = (1,1,1)
+dt = 1/50
+sugarbox = vp.box(pos=vp.vector(10,10,10), size=vp.vector(5,5,5), axis=vp.vector(0,0,0), up = uy)
+
+L0 = np.array([[0.],[0.],[0.]]) # Moment cinétique initial
+I = np.eye(3) # Tenseur inertie du satellite
+dw = np.zeros((3,1)) # vecteur de l'accélération angulaire des RI
+M = np.array([[1.],[0.],[0.]]) # vecteur du moment magnétique des bobines
+J = 1 # moment d'inertie des Ri
+B = np.array([[0.],[0.],[1.]]) # Champ magnétique environnant
+
+sim = Simulator(dt,L0) #on créée un objet sim qui fera les simus
+
+while True:
+    W = sim.getNextIteration(M,dw,J,B,I) # on récupère le prochain vecteur rotation
+    # Rotate: rotation de tout l'objet autour de la droite de vecteur directeur <axis> et passant par <origin>)
+    sugarbox.rotate(angle=np.linalg.norm(W)*dt, axis=vp.vector(W[0][0],W[1][0],W[2][0]))
+    # Rate : réalise 50 fois la boucle par seconde
+    vp.rate(1/dt)
