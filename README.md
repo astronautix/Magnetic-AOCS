@@ -1,6 +1,6 @@
 # SCAO
 
-## Installation
+## Installatione
 
 ## Dépendances
 
