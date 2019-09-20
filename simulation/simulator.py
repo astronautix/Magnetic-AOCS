@@ -2,10 +2,10 @@ import numpy as np
 
 class Simulator:
 
-    def __init__(self,dt,L0):
+    def __init__(self,dt,L0,Q0 = np.array([[1.],[0.],[0.],[0.]])):
         self.t = 0 #temps écoulé
         self.dt = dt
-        self.Q = np.array([[1.],[0.],[0.],[0.]]) #quaternion de rotation de Rv par rapport à Rr
+        self.Q = Q0 #quaternion de rotation de Rv par rapport à Rr
         self.L = L0 #Moment cinétique du satellite dans Rr
 
     def transferMatrix(self): #transfer matrix from Rr to Rv i.e. X_Rr = M * X_Rv
