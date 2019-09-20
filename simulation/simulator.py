@@ -36,5 +36,6 @@ class Simulator:
         self.L += self.dL(M,dw,J,B)*self.dt #calcul du nouveau moment cinétique
         W = np.dot(np.linalg.inv(np.dot(self.transferMatrix(),I)),self.L) #Vecteur rotation du satellite dans Rr
         self.Q += self.dQ(W)*self.dt #calcul de la nouvelle orientation
+        self.Q /= np.linalg.norm(self.Q)
         self.t += self.dt
         return W
