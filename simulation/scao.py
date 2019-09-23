@@ -11,17 +11,26 @@ class scao():
         P: facteur P du PID
         D: facteur D du PID
         """
-        self.listQ = []
-        self.listL = []
-        self.J = J
+        self.Q = None
+        self.L = None
+        self.B = None
         self.P = P
         self.D = D
+
+    def checkSets(self):
+        if self.Q is None or self.L is None:
+            raise RuntimeError("setAttitude or setRotation have not been called")
         return
 
-    def addAttitude(self, Q):
-        """ Ajoute le quaternion actuel à la liste des attitudes.
-        """
-        self.listQ.append(Q)
+    def setAttitude(self, Q): #Ajoute le quaternion actuel à la liste des attitudes.
+        self.Q = Q
 
-    def setMagneticMoment(self, W, B):
-        return self.K*np.cross(W,B, axisa=0, axisb=0,axisc=0))
+    def setRotation(self, W):
+        self.W = W
+
+    def setMagneticField(self, B):
+        self.B = B
+
+    def getCommandDetumbling(self):
+        self.checkSets()
+        # TODO

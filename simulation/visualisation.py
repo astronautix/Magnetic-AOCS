@@ -2,7 +2,7 @@ from simulator import Simulator
 import vpython as vp
 from math import *
 import numpy as np
-
+from scao import SCAO
 
 lx,ly,lz = 5,10,1
 m = 1
@@ -35,10 +35,18 @@ satellite = vp.compound([axe_x_s,axe_y_s,axe_z_s,sugarbox])
 b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(B[0][0],B[1][0],B[2][0]), shaftwidth=0.1, color=vp.vector(1,1,1))
 
 sim = Simulator(dt,L0) #on créée un objet sim qui fera les simus
+stab = SCAO(I,J,10,10)
 
 while True:
+
     W = sim.getNextIteration(M,dw,J,B,I) # on récupère le prochain vecteur rotation
+
+    stab.setAttitude(sim.Q)
+    stab.setRotation(W)
+    stab.setMagneticField(B)
+    M = stab.getCommand()
+
     # Rotate: rotation de tout l'objet autour de la droite de vecteur directeur <axis> et passant par <origin>)
     satellite.rotate(angle=np.linalg.norm(W)*dt, axis=vp.vector(W[0][0],W[1][0],W[2][0]), origin=vp.vector(10,10,10))
-    # Rate : réalise 50 fois la boucle par seconde
+    # Rate : réalise 1/dt fois la boucle par seconde
     vp.rate(1/dt)
