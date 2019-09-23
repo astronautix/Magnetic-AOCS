@@ -34,7 +34,7 @@ class Simulator:
         # I : Tenseur d'inertie du satellite exprimé dans Rv
         # B : Vecteur champ magnétique environnant, exprimé dans Rr
         self.L += self.dL(M,dw,J,B)*self.dt #calcul du nouveau moment cinétique
-        W = np.dot(np.linalg.inv(np.dot(self.transferMatrix(),I)),self.L) #Vecteur rotation du satellite dans Rr
+        W = np.dot(self.transferMatrix(),np.dot(np.linalg.inv(np.dot(self.transferMatrix(),I)),self.L)) #Vecteur rotation du satellite dans Rr
         self.Q += self.dQ(W)*self.dt #calcul de la nouvelle orientation
         self.Q /= np.linalg.norm(self.Q)
         self.t += self.dt

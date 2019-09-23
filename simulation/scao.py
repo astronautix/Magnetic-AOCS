@@ -1,6 +1,6 @@
 import numpy as np
 
-class scao():
+class SCAO:
 
     def __init__(self, I, J, P, D):
         """
@@ -26,11 +26,13 @@ class scao():
         self.Q = Q
 
     def setRotation(self, W):
+        #le vecteur rotation est mesuré dans R_v
         self.W = W
 
     def setMagneticField(self, B):
+        #le champ est mesuré dans R_v
         self.B = B
 
     def getCommandDetumbling(self):
-        self.checkSets()
-        # TODO
+        # self.checkSets()
+        return self.P*np.cross(self.W, self.B, axisa=0, axisb=0,axisc=0)
