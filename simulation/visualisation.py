@@ -45,7 +45,7 @@ while True:
     # Sauvegarder les valeurs de simulation actuelles:
     stab.setAttitude(sim.Q)
     stab.setRotation(np.dot(P_v_r,W))
-    print("W : {},{},{}".format(W[0][0],W[1][0],W[2][0]) +" ; " + str(np.linalg.norm(W)))
+    print("W : " + str(W[:,0]) + "; norm : " + str(np.linalg.norm(W)))
     stab.setMagneticField(np.dot(P_v_r,B))
 
     # Calculer le moment magnétique à fournir:
