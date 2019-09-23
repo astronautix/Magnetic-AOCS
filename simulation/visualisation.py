@@ -4,11 +4,13 @@ from math import *
 import numpy as np
 
 
+lx,ly,lz = 5,10,1
+m = 1
 dt = 1/50
-L0 = np.array([[0.],[0.],[0.]]) # Moment cinétique initial
-I = np.eye(3) # Tenseur inertie du satellite
+L0 = np.array([[40],[0.01],[0.]]) # Moment cinétique initial
+I = np.diag((m*(ly**2+lz**2)/3,m*(lx**2+lz**2)/3,m*(lx**2+ly**2)/3)) # Tenseur inertie du satellite
 dw = np.array([[0.],[0.],[0.]]) # vecteur de l'accélération angulaire des RI
-M = np.array([[1.],[0.],[0.]]) # vecteur du moment magnétique des bobines
+M = np.array([[0.],[0.],[0.]]) # vecteur du moment magnétique des bobines
 J = 1 # moment d'inertie des Ri
 B = np.array([[0.],[0.],[1.]]) # Champ magnétique environnant
 
@@ -26,7 +28,7 @@ axe_z_r = vp.arrow(pos=vp.vector(0,0,0), axis=10*uz, shaftwidth=0.5, color=vp.ve
 axe_x_s = vp.arrow(pos=vp.vector(10,10,10), axis=10*ux, shaftwidth=0.1, color=vp.vector(1,0,0))
 axe_y_s = vp.arrow(pos=vp.vector(10,10,10), axis=10*uy, shaftwidth=0.1, color=vp.vector(0,1,0))
 axe_z_s = vp.arrow(pos=vp.vector(10,10,10), axis=10*uz, shaftwidth=0.1, color=vp.vector(0,0,1))
-sugarbox = vp.box(pos=vp.vector(10,10,10), size=vp.vector(5,5,5), axis=vp.vector(0,0,0), up = uy)
+sugarbox = vp.box(pos=vp.vector(10,10,10), size=vp.vector(lx,ly,lz), axis=vp.vector(0,0,0), up = uy)
 satellite = vp.compound([axe_x_s,axe_y_s,axe_z_s,sugarbox])
 
 #vecteur champ B
