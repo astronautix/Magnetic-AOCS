@@ -1,15 +1,17 @@
+import sys
+sys.path.append('..')
 from simulator import Simulator
 import vpython as vp
 from math import *
 import numpy as np
-from scao import SCAO
+from scao.scao import SCAO
 from random import *
 
 lx,ly,lz = 10,10,10
 m = 1
 dt = 1/50
 I = np.diag((m*(ly**2+lz**2)/3,m*(lx**2+lz**2)/3,m*(lx**2+ly**2)/3)) # Tenseur inertie du satellite
-W0 = np.array([[0],[0],[0]])
+W0 = np.array([[5*random()],[5*random()],[5*random()]]) #rotation initiale dans le référentiel R_r
 L0 = np.dot(I,W0) # Moment cinétique initial !! Attention à bien vérifier que tout est dans le bon référentiel !!
 dw = np.array([[0.],[0.],[0.]]) # vecteur de l'accélération angulaire des RI
 M = np.array([[0.],[0.],[0.]]) # vecteur du moment magnétique des bobines
@@ -66,6 +68,8 @@ while True:
     # Calculer le moment magnétique à fournir:
     M = stab.getCommandDetumblingMagnetic()
     #dw = stab.getCommandDetumblingWheel()
+
+    print("W : " + str(W[:,0]) + "; norm : " + str(np.linalg.norm(W)) + "; dw : " + str(dw[:,0]))
 
     # Rotate: rotation de tout l'objet autour de la droite de vecteur directeur <axis> et passant par <origin>)
     satellite.rotate(angle=np.linalg.norm(W)*dt, axis=vp.vector(W[0][0],W[1][0],W[2][0]), origin=vp.vector(10,10,10))
