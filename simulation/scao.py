@@ -55,7 +55,6 @@ class SCAO:
 
         #Autrement, on utilise le fait que WxB = dB/dt (B-dot algorithm)
         dB = np.dot(self.Mvr,(self.B[-1]-self.B[-2])/self.delta_t)
-        print("dB = " + str(dB))
         return -self.P_d_mt*dB
 
     def getCommandDetumblingWheel(self):
@@ -69,5 +68,4 @@ class SCAO:
         r = np.transpose(r/np.linalg.norm(r)) #r est le vecteur autour duquel il faut tourner : axe du couple à appliquer!
         e = acos(Qr[0,0])*2 #angle de rotation à effecter : correspond à l'erreur!
         a = np.dot(self.Mvr,np.dot(self.P_s_rw, -e*r))
-        print(r)
         return a
