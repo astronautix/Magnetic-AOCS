@@ -38,26 +38,31 @@ satellite = vp.compound([axe_x_s,axe_y_s,axe_z_s,sugarbox])
 b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(B[0][0],B[1][0],B[2][0]), shaftwidth=0.1, color=vp.vector(1,1,1))
 
 sim = Simulator(dt,L0) #on créée un objet sim qui fera les simus
-stab = SCAO(I,J,500,500,np.diag((0,0,0)),10*np.diag((1,1,1)),np.diag((0,0,0)),np.diag((0,0,0)),dt)
+stab = SCAO(I,J,500,500,np.diag((0,0,0)),100*np.diag((1,1,1)),np.diag((0,0,0)),np.diag((0,0,0)),dt)
 
-w_iw = np.zeros((3,1)) #vitesse des roues d'inertie
+w_iw = np.zeros((3,1)) #vitesse des roues d'inertie (permet de sauvegarder la précédente)
+nbit = 0
 while True:
     W = sim.getNextIteration(M,dw,J,B,I) # on récupère le prochain vecteur rotation
 
     # Sauvegarder les valeurs de simulation actuelles:
     stab.setAttitude(sim.Q)
     stab.setRotation(W)
-    stab.setMagneticField(np.dot(P_v_r,B))
+    stab.setMagneticField(B)
 
-    # Calculer le moment magnétique à fournir:
-    #M = stab.getCommandDetumblingMagnetic()
-    #dw = stab.getCommandDetumblingWheel()
-    res = stab.getCommandStabWheel(np.array([[0.5],[0.5],[0.5],[0.5]]))
-    dw = (res - w_iw)/dt # https://quaternions.online/
-    w_iw = res
+    if nbit >= 50: #ne lance pas immediatement le detumbling
+        res = stab.getCommandStabWheel(np.array([[0.5],[0.5],[0.5],[0.5]]))  # https://quaternions.online/
+        dw = (res - w_iw)/dt #on commande en fait en vitesse de rotation et pas en accélétation
+        w_iw = res
+
+        if nbit %10 == 0:
+            print("W : " + str(W[:,0]) + "; norm : " + str(np.linalg.norm(W)) + "; dw : " + str(dw[:,0]))
+
 
     # Rotate: rotation de tout l'objet autour de la droite de vecteur directeur <axis> et passant par <origin>)
     satellite.rotate(angle=np.linalg.norm(W)*dt, axis=vp.vector(W[0][0],W[1][0],W[2][0]), origin=vp.vector(10,10,10))
 
     # Rate : réalise 1/dt fois la boucle par seconde
     vp.rate(1/dt)
+
+    nbit += 1
