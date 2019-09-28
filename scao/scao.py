@@ -23,6 +23,7 @@ class SCAO:
         self.delta_t = delta_t
 
         self.P_s_rw = P_StabWheel
+        self.D_s_rw = D_StabWheel
 
     def transferMatrix(self,Q): #transfer matrix from Rr to Rv i.e. X_Rr = M * X_Rv
         q0,q1,q2,q3 = Q[0][0],Q[1][0],Q[2][0],Q[3][0]
@@ -56,10 +57,18 @@ class SCAO:
         return self.P_d_rw*(np.dot(self.Mvr,self.W))
 
     def getCommandStabWheel(self,Qt):
+        #proportional term
         Qr = Quaternion(*Qt[:,0])*Quaternion(*self.Q[-1][:,0]).inv() #quaternion relatif qui effectue la rotation depuis Q vers Qt
         Qr = Qr.vec()
         r = np.array([Qr[1:,0]])
         r = np.transpose(r/np.linalg.norm(r)) #r est le vecteur autour duquel il faut tourner : axe du couple à appliquer!
         e = acos(max(-1,min(Qr[0,0],1)))*2 #angle de rotation à effecter : correspond à l'erreur!
         a = np.dot(self.Mvr,np.dot(self.P_s_rw, -e*r))
+
+        #derivative term
+        W = self.W[-1]
+        dr = W/np.linalg.norm(W)
+        de = np.linalg.norm(W)
+        a += np.dot(self.Mvr,np.dot(self.D_s_rw, de*dr))
+
         return a
