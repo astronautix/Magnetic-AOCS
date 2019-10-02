@@ -62,7 +62,7 @@ class SCAO:
         return self.P_d_rw*(np.dot(self.Mvr,self.W))
 
     def getCommandStabWheel(self,Qt):
-        #Qt = targeted attitude
+        #Qt = targeted attitude /!\ N'est pas un objet quaternion (mais un quaternion formel)
         #proportional term
         Qr = Quaternion(*Qt[:,0])*Quaternion(*self.Q[-1][:,0]).inv() #quaternion relatif qui effectue la rotation depuis Q vers Qt
         Qr = Qr.vec()

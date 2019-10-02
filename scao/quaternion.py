@@ -10,6 +10,9 @@ class Quaternion:
         self.tmsave = None
         self.tminvsave = None
     def inv(self):
+        """ Calcule le conjugué du quaternion.
+            Ceux-ci étant unitaires, inverse = conjugué.
+        """
         return Quaternion(self.a,-self.b,-self.c,-self.d)
     def vec(self):
         return np.array([[self.a],[self.b],[self.c],[self.d]])
