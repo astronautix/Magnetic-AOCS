@@ -14,7 +14,7 @@ class SCAO:
         P_d_mt: facteurs P du PID pour les magnetorquers pour le detumbling (matrice 3x3 diagonale)
         P_d_rw: facteurs P du PID pour les roues à inertie pour le détumbling (matrice 3x3 diagonale)
         P_s: facteur P du PID pour le controle d'attitude
-        D_s: facteur D du PID pour le controle d'attitude 
+        D_s: facteur D du PID pour le controle d'attitude
         """
         self.Q = [] #exprimé dans Rr
         self.W = [] #exprimé dans Rr
@@ -64,7 +64,8 @@ class SCAO:
         return self.P_d_rw*(np.dot(self.Mvr,self.W))
 
     def getCommand(self,Qt):
-        #Qt = targeted attitude /!\ N'est pas un objet quaternion (mais un quaternion formel)
+        #Qt = targeted attitude /!\ N'est pas un objet Quaternion (mais un quaternion formel)
+        
         #proportional term
         Qr = Quaternion(*Qt[:,0])*Quaternion(*self.Q[-1][:,0]).inv() #quaternion relatif qui effectue la rotation depuis Q vers Qt
         Qr = Qr.vec()
