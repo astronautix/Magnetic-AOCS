@@ -6,6 +6,7 @@ from math import *
 import numpy as np
 from scao.scao import SCAO
 from random import *
+import matplotlib.pyplot as plt
 
 lx,ly,lz = 10,10,10
 m = 1
@@ -38,21 +39,21 @@ satellite = vp.compound([axe_x_s,axe_y_s,axe_z_s,sugarbox])
 b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(B[0][0],B[1][0],B[2][0]), shaftwidth=0.1, color=vp.vector(1,1,1))
 
 sim = Simulator(dt,L0) #on créée un objet sim qui fera les simus
-stab = SCAO(I,J,500,500,10,10,dt)
+stab = SCAO(I,J,10,10,3,dt)
 nbit = 0
+Wr = []
 while True:
     W = sim.getNextIteration(M,dw,J,B,I) # on récupère le prochain vecteur rotation
-
+    Wr.append(np.linalg.norm(W))
     # Sauvegarder les valeurs de simulation actuelles:
     stab.setAttitude(sim.Q)
     stab.setRotation(W)
     stab.setMagneticField(B)
 
     if nbit >= 50: #ne lance pas immediatement le detumbling
-        # Calculer le moment magnétique à fournir:
-        #M = stab.getCommandDetumblingMagnetic()
-        M = stab.getCommandDetumblingMagneticBDot()
-        #dw = stab.getCommandDetumblingWheel()
+        # Calculer les corrections
+        dw, M = stab.getCommand(np.array([[0.5],[0.5],[0.5],[0.5]]))
+        print(W)
         if nbit %10 == 0:
             print("W : " + str(W[:,0]) + "; norm : " + str(np.linalg.norm(W)) + "; dw : " + str(dw[:,0]))
 

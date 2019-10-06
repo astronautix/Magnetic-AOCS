@@ -4,7 +4,7 @@ from math import acos
 
 class SCAO:
 
-    def __init__(self, I, J, P_DetumblingMagnetic, P_DetumblingWheel, P_stab, D_stab, delta_t):
+    def __init__(self, I, J, P, D, dP, delta_t):
         """
         listQ: liste des attitudes dans Rr
         listL: liste des moments cinétiques dans Rr
@@ -21,12 +21,11 @@ class SCAO:
         self.B = [] #exprimé dans Rv /!\
         self.Mrv = None
         self.Mvr = None
-        self.P_d_mt = P_DetumblingMagnetic
-        self.P_d_rw = P_DetumblingWheel
         self.delta_t = delta_t
-
-        self.P_s = P_stab
-        self.D_s = D_stab
+        self.P = P
+        self.D = D
+        self.dP = dP
+        self.I = I
 
     def transferMatrix(self,Q): #
         """ Calculate transfer matrix from Rr to Rv, i.e. X_Rr = M * X_Rv """
@@ -37,7 +36,7 @@ class SCAO:
 
     def setAttitude(self, Q):
         """ Ajoute le quaternion actuel à la liste des attitudes."""
-        self.Q.append(Q)
+        self.Q.append(Quaternion(*Q[:,0]))
         self.Mrv = self.transferMatrix(Q) #X_Rr = Mrv * X_Rv
         self.Mvr = np.linalg.inv(self.Mrv) #X_Rv = Mvr * X_Rr
 
@@ -49,35 +48,26 @@ class SCAO:
         """ Calcule B dans Rv et l'ajoute."""
         self.B.append(np.dot(self.Mvr,B))
 
-    def getCommandDetumblingMagnetic(self):
-        """ Détumbling magnétique si accès à la donnée W via les instruments de mesure."""
-        return self.P_d_mt*np.cross(np.dot(self.Mvr,self.W[-1]), self.B[-1], axisa=0, axisb=0,axisc=0)
-
-    def getCommandDetumblingMagneticBDot(self):
-        """ Détumbling magnétique si on connait uniquement le champ B instantanné.
-            On utilise le fait que WxB = dB/dt (B-dot algorithm)"""
-        dB = (self.B[-1]-self.B[-2])/self.delta_t
-        return -self.P_d_mt*dB
-
-    def getCommandDetumblingWheel(self):
-        """ Détumbling mécanique si accès à W."""
-        return self.P_d_rw*(np.dot(self.Mvr,self.W))
-
-    def getCommand(self,Qt):
+    def getTorque(self,Qt):
         #Qt = targeted attitude /!\ N'est pas un objet Quaternion (mais un quaternion formel)
-        
+
         #proportional term
-        Qr = Quaternion(*Qt[:,0])*Quaternion(*self.Q[-1][:,0]).inv() #quaternion relatif qui effectue la rotation depuis Q vers Qt
-        Qr = Qr.vec()
-        r = np.array([Qr[1:,0]]) #r est le vecteur autour duquel il faut tourner : axe du couple à appliquer!
-        r = np.transpose(r/np.linalg.norm(r))
-        e = acos(max(-1,min(Qr[0,0],1)))*2 #angle de rotation à effectuer : correspond à l'erreur!
-        command = np.dot(self.Mvr,-self.P_s_rw*e*r)
+        Qr = Quaternion(*Qt[:,0])*self.Q[-1].inv() #quaternion relatif qui effectue la rotation depuis Q vers Qt
+        dynamicalP = self.P/(1+np.linalg.norm(self.W[-1]))**self.dP #dynamical P-factor
+        error = np.dot(self.Mvr,-dynamicalP*Qr.angle()*Qr.axis())
 
         #derivative term
-        command += np.dot(self.Mvr,self.D_s_rw*self.W[-1])
+        error += np.dot(self.Mvr,self.D*self.W[-1])
 
-        return command
+        torque = np.dot(np.dot(np.dot(self.Q[-1].tm(),self.I),self.Q[-1].tminv()),error)
+
+        return torque
 
 
-    # def getTorque(self, Qt):
+    def getCommand(self, Qt):
+        torque = self.getTorque(Qt)
+        B_dir = self.B[-1]/np.linalg.norm(self.B[-1])
+        torque_perp = torque - np.dot(np.transpose(torque), B_dir)[0,0]*B_dir
+        M = np.cross(torque_perp, B_dir, axisa=0,axisb=0,axisc=0)/np.linalg.norm(self.B[-1]) #inversion de C=MxB
+        dw = np.array([[0],[0],[0]])
+        return dw, M
