@@ -51,7 +51,7 @@ class SCAO:
     def getTorque(self,Qt):
         #Qt = targeted attitude /!\ N'est pas un objet Quaternion (mais un quaternion formel)
 
-        #proportional term
+        #proportional term - the error is expressed in R_v
         Qr = Quaternion(*Qt[:,0])*self.Q[-1].inv() #quaternion relatif qui effectue la rotation depuis Q vers Qt
         dynamicalP = self.P/(1+np.linalg.norm(self.W[-1]))**self.dP #dynamical P-factor
         error = np.dot(self.Mvr,-dynamicalP*Qr.angle()*Qr.axis())
@@ -59,6 +59,7 @@ class SCAO:
         #derivative term
         error += np.dot(self.Mvr,self.D*self.W[-1])
 
+        #moment à appliquer
         torque = np.dot(np.dot(np.dot(self.Q[-1].tm(),self.I),self.Q[-1].tminv()),error)
 
         return torque
@@ -68,6 +69,6 @@ class SCAO:
         torque = self.getTorque(Qt)
         B_dir = self.B[-1]/np.linalg.norm(self.B[-1])
         torque_perp = torque - np.dot(np.transpose(torque), B_dir)[0,0]*B_dir
-        M = np.cross(torque_perp, B_dir, axisa=0,axisb=0,axisc=0)/np.linalg.norm(self.B[-1]) #inversion de C=MxB
-        dw = np.array([[0],[0],[0]])
+        M = np.cross(torque_perp, B_dir, axisa=0,axisb=0,axisc=0)/np.linalg.norm(self.B[-1]) #"inversion" de C=MxB
+        dw = np.array([[0],[0],[0]]) #pour l'instant, pas de commande selon les roues
         return dw, M
