@@ -51,16 +51,16 @@ class SCAO:
     def getTorque(self,Qt):
         #Qt = targeted attitude /!\ N'est pas un objet Quaternion (mais un quaternion formel)
 
-        #proportional term - the error is expressed in R_v
+        #proportional term - the error is expressed in R_r
         Qr = Quaternion(*Qt[:,0])*self.Q[-1].inv() #quaternion relatif qui effectue la rotation depuis Q vers Qt
-        dynamicalP = self.P/(1+np.linalg.norm(self.W[-1]))**self.dP #dynamical P-factor
-        error = -dynamicalP*Qr.angle()*Qr.axis()
+        dynamicalP = np.dot(self.Mvr,self.P/(1+np.linalg.norm(self.W[-1]))**self.dP)) #dynamical P-factor
+        error = np.dot(self.Mvr,-dynamicalP*Qr.angle()*Qr.axis())
 
         #derivative term
         error += self.D*self.W[-1]
 
         #moment à appliquer
-        torque = np.dot(np.dot(np.dot(self.Q[-1].tm(),self.I),self.Q[-1].tminv()),error)
+        torque = np.dot(self.I,error)
 
         return torque
 
