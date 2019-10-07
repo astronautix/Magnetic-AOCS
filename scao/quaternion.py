@@ -50,7 +50,7 @@ class Quaternion:
         elif index == 1:
             return self.b
         elif index == 2:
-            return slef.c
+            return self.c
         elif index == 3:
             return self.d
         else:
