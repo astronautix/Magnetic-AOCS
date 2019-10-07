@@ -54,10 +54,10 @@ class SCAO:
         #proportional term - the error is expressed in R_v
         Qr = Quaternion(*Qt[:,0])*self.Q[-1].inv() #quaternion relatif qui effectue la rotation depuis Q vers Qt
         dynamicalP = self.P/(1+np.linalg.norm(self.W[-1]))**self.dP #dynamical P-factor
-        error = np.dot(self.Mvr,-dynamicalP*Qr.angle()*Qr.axis())
+        error = -dynamicalP*Qr.angle()*Qr.axis()
 
         #derivative term
-        error += np.dot(self.Mvr,self.D*self.W[-1])
+        error += self.D*self.W[-1]
 
         #moment à appliquer
         torque = np.dot(np.dot(np.dot(self.Q[-1].tm(),self.I),self.Q[-1].tminv()),error)
