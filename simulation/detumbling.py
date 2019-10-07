@@ -39,7 +39,7 @@ satellite = vp.compound([axe_x_s,axe_y_s,axe_z_s,sugarbox])
 b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(B[0][0],B[1][0],B[2][0]), shaftwidth=0.1, color=vp.vector(1,1,1))
 
 sim = Simulator(dt,L0) #on créée un objet sim qui fera les simus
-stab = SCAO(I,J,1,1,2,dt)
+stab = SCAO(I,J,3,3,2,dt)
 nbit = 0
 Wr = []
 while True:
