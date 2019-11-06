@@ -39,7 +39,7 @@ class Quaternion:
             )
         return self.tmsave
 
-    def tminv(self): #transfer matrix from Rr to Rv i.e. X_Rr = M * X_Rv
+    def tminv(self): #transfer matrix from Rv to Rr i.e. X_Rv = M * X_Rr
         if self.tminvsave is None:
             self.tminvsave = np.linalg.inv(self.tm())
         return self.tminvsave
