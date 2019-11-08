@@ -11,13 +11,13 @@ class Orbit:
     # geocentric gravitationnal constant (in m^3.s^-2)
     # mu = 3.986004418e14
 
-        """
-        Contient les paramètres orbitaux de la mission.
+    """
+    Contient les paramètres orbitaux de la mission.
 
-        Permet de recevoir, à un temps donné, la position actuelle.
+    Permet de recevoir, à un temps donné, la position actuelle.
 
-        Permet aussi de calculer les matrices de transferts pour différents référentiels.
-        """
+    Permet aussi de calculer les matrices de transferts pour différents référentiels.
+    """
 
 
     def __init__(self, omega, i, e, r_p, mu=3.986004418e14, tau=0):

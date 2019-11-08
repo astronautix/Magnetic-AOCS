@@ -22,7 +22,7 @@ class Environment:
         delta : magnetic pole drift
         k : unit vector supporting the dipole vector
         """
-        self.mu_e = 7.7425
+        self.mu_e = mu_e
         self.r = None
         self.i = None
         self.u = None
