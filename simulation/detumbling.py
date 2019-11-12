@@ -64,26 +64,29 @@ nbit = 0
 Wr = []
 while True:
     t+=dt
-    orbite.setTime(t)
+    orbite.setTime(0.05*t)
     environnement.setPosition(orbite.getPosition())
     B = environnement.getEnvironment() #dans le référentiel géocentrique
     B = np.dot(orbite.A_xs(), np.dot(orbite.A_sy(), B)) # dans le référentiel du satellite
     b_vector.axis = 10*vp.vector(B[0][0],B[1][0],B[2][0])
+
+    #B = [[1],[1],[0]] #impose constant B field for testing
 
     W = sim.getNextIteration(M,dw,J,B,I) # on récupère le prochain vecteur rotation
     Wr.append(np.linalg.norm(W))
     # Sauvegarder les valeurs de simulation actuelles:
     stab.setAttitude(sim.Q)
     stab.setRotation(W)
+
     stab.setMagneticField(B)
 
     if nbit >= 50: #ne lance pas immediatement le detumbling
         # Calculer les corrections
-        dw, M = stab.getCommand(np.array([[0.5],[0.5],[0.5],[0.5]]))
-        
-        #print("Magnetic field:", str(np.linalg.norm(B)), " "*30, end="\r")
-        print("dw:", str(dw[:,0]), "|| M:", str(M[:,0]), " "*30 , end="\r")
-        #print("W :", str(W[:,0]), "|| norm :", str(np.linalg.norm(W)), "|| dw :", str(dw[:,0]), " "*30, end="\r" )
+        dw, M = stab.getCommand(np.array([[0.5],[0.5],[0.5],[0.5]])) #dans Rv
+
+        #print("Magnetic field:", str(np.linalg.norm(B)))
+        #print("dw:", str(sim.Q.V2R(dw[:,0])), "|| M:", str(sim.Q.V2R(M[:,0])))
+        print("W :", str(W[:,0]), "|| norm :", str(np.linalg.norm(W)), "|| dw :", str(dw[:,0]))
 
     # Rotate: rotation de tout l'objet autour de la droite de vecteur directeur <axis> et passant par <origin>)
     satellite.rotate(angle=np.linalg.norm(W)*dt, axis=vp.vector(W[0][0],W[1][0],W[2][0]), origin=vp.vector(10,10,10))

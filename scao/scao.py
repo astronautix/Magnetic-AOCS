@@ -40,8 +40,11 @@ class SCAO:
     def getCommand(self, Qt):
         Qt = Quaternion(*Qt[:,0])
 
-        M = -(1-self.rwRatio)*self.stabMT(self.Q,self.W,Qt,self.B,self.I)
+        Bv = self.Q.R2V(self.B)
+        torqueM = -(1-self.rwRatio)*self.stabMT(self.Q,self.W,Qt,self.B,self.I)
+        B_dir = Bv/np.linalg.norm(Bv)
+        M = np.cross(torqueM, B_dir, axisa=0,axisb=0,axisc=0)/np.linalg.norm(Bv) #"inversion" de C=MxB
 
         dw = -self.rwRatio*self.stabRW(self.Q,self.W,Qt,self.B,self.I)
 
-        return dw, M
+        return dw, M #dans Rv
