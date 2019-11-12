@@ -80,12 +80,10 @@ while True:
     if nbit >= 50: #ne lance pas immediatement le detumbling
         # Calculer les corrections
         dw, M = stab.getCommand(np.array([[0.5],[0.5],[0.5],[0.5]]))
-        #print(W)
-        print("Magnetic field:\n" + str(np.linalg.norm(B)))
-        print("Torques:\n - " + str(dw) + "\n - "+str(M))
-
-        #if nbit %10 == 0:
-        #    print("W : " + str(W[:,0]) + "; norm : " + str(np.linalg.norm(W)) + "; dw : " + str(dw[:,0]))
+        
+        #print("Magnetic field:", str(np.linalg.norm(B)), " "*30, end="\r")
+        print("dw:", str(dw[:,0]), "|| M:", str(M[:,0]), " "*30 , end="\r")
+        #print("W :", str(W[:,0]), "|| norm :", str(np.linalg.norm(W)), "|| dw :", str(dw[:,0]), " "*30, end="\r" )
 
     # Rotate: rotation de tout l'objet autour de la droite de vecteur directeur <axis> et passant par <origin>)
     satellite.rotate(angle=np.linalg.norm(W)*dt, axis=vp.vector(W[0][0],W[1][0],W[2][0]), origin=vp.vector(10,10,10))
