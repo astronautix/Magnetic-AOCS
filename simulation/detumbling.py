@@ -5,13 +5,9 @@ import vpython as vp
 from math import *
 import numpy as np
 from scao.scao import SCAO
-<<<<<<< HEAD
 from scao.stabAlgs import PIDRW, PIDMT
-=======
-from scao.stabAlgs import PID, PIDMag
 from environnement.environment import Environment
 from environnement.orbit import Orbit
->>>>>>> 46bba44976d73a265137a55706811b1a6ecc9bbe
 from random import *
 import matplotlib.pyplot as plt
 
@@ -84,17 +80,12 @@ while True:
     if nbit >= 50: #ne lance pas immediatement le detumbling
         # Calculer les corrections
         dw, M = stab.getCommand(np.array([[0.5],[0.5],[0.5],[0.5]]))
-<<<<<<< HEAD
-        if nbit%10 == 0:
-            print("W : " + str(W[:,0]) + "; norm : " + str(np.linalg.norm(W)) + "; dw : " + str(dw[:,0]))
-=======
         #print(W)
         print("Magnetic field:\n" + str(np.linalg.norm(B)))
         print("Torques:\n - " + str(dw) + "\n - "+str(M))
 
         #if nbit %10 == 0:
         #    print("W : " + str(W[:,0]) + "; norm : " + str(np.linalg.norm(W)) + "; dw : " + str(dw[:,0]))
->>>>>>> 46bba44976d73a265137a55706811b1a6ecc9bbe
 
     # Rotate: rotation de tout l'objet autour de la droite de vecteur directeur <axis> et passant par <origin>)
     satellite.rotate(angle=np.linalg.norm(W)*dt, axis=vp.vector(W[0][0],W[1][0],W[2][0]), origin=vp.vector(10,10,10))
