@@ -1,10 +1,11 @@
 import numpy as np
 from scao.quaternion import Quaternion
+from math import acos
 
-def PID(P, D, dP):
+def PIDRW(P, D, dP): ## BUG: CHECK HERE FOR REF CONSISTENCY
     def res(Q,W,Qt,B,I):
         #Qt = targeted attitude /!\ N'est pas un objet Quaternion (mais un quaternion formel)
-        #proportional term - the error is expressed in R_r
+        #proportional term - the error is expressed in R_v
         Qr = Qt*Q.inv() #quaternion relatif qui effectue la rotation depuis Q vers Qt
         dynamicalP = P/(1+np.linalg.norm(W))**dP #dynamical P-factor
         error = np.dot(Q.tminv(),dynamicalP*Qr.angle()*Qr.axis())
@@ -19,19 +20,22 @@ def PID(P, D, dP):
 
     return res
 
-def PIDMag(P, D, dP):
+def PIDMT(P, D, dP):
     def res(Q,W,Qt,B,I):
         #Qt = targeted attitude /!\ N'est pas un objet Quaternion (mais un quaternion formel)
-        #proportional term - the error is expressed in R_r
-        Tv = np.dot(Qt.tminv(),B)
-        Tr = np.dot(Q.tm(),Tv)
+        #proportional term - the error is expressed in R_v
+        Tv = Qt.R2V(B)
+        Tr = Q.V2R(Tv)
 
-        dir = np.cross(Tr,B,axisa=0,axisb=0,axisc=0)/np.linalg.norm(B)**2
-        dir = dir/np.linalg.norm(dir)*asin(np.linalg.norm(dir))
-        error = np.dot(Q.tminv(),P*dir)
+        dir = np.cross(Tr,B,axisa=0,axisb=0,axisc=0)
+        angle = np.dot(np.transpose(Tr),B)
+        angle = acos(np.linalg.norm(angle)/(np.linalg.norm(Tr)*np.linalg.norm(B)))
+        dir = dir/np.linalg.norm(dir)*angle
+        error = 0*Q.R2V(P*dir)
 
         #derivative term
-        error += np.dot(Q.tminv(),D*W)
+        spareW = W - np.dot(np.transpose(W),B/np.linalg.norm(B))*B/np.linalg.norm(B)
+        error = Q.R2V(D*spareW)
 
         #moment à appliquer
         torque = -np.dot(I,error)

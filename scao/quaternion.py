@@ -62,3 +62,9 @@ class Quaternion:
 
     def angle(self):
         return acos(max(-1,min(self.a,1)))*2
+
+    def V2R(self,vec):
+        return np.dot(self.tm(),vec)
+
+    def R2V(self,vec):
+        return np.dot(self.tminv(),vec)

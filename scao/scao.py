@@ -4,7 +4,7 @@ from math import acos, asin
 
 class SCAO:
 
-    def __init__(self, stabAlg, I, J, delta_t):
+    def __init__(self, stabRW, stabMT, rwRatio, I, J, delta_t):
         """
         listQ: liste des attitudes dans Rr
         listL: liste des moments cinétiques dans Rr
@@ -20,12 +20,14 @@ class SCAO:
         self.W = None #exprimé dans Rr
         self.B = None #exprimé dans Rr
         self.delta_t = delta_t
-        self.I = I
-        self.stabAlg = stabAlg
+        self.I = I #exprimé dans Rv
+        self.rwRatio = rwRatio
+        self.stabRW = stabRW #retourne un vecteur dans Rv
+        self.stabMT = stabMT #retourne un vecteur dans Rv
 
     def setAttitude(self, Q):
         """ Ajoute le quaternion actuel à la liste des attitudes."""
-        self.Q = Quaternion(*Q[:,0])
+        self.Q = Q
 
     def setRotation(self, W):
         """ Ajoute le vecteur rotation actuel à la liste des rotations."""
@@ -37,10 +39,9 @@ class SCAO:
 
     def getCommand(self, Qt):
         Qt = Quaternion(*Qt[:,0])
-        torque = self.stabAlg(self.Q,self.W,Qt,self.B,self.I)
-        B_dir = np.dot(self.Q.tminv(),self.B)/np.linalg.norm(self.B)
-        torque_perp = torque - np.dot(np.transpose(torque), B_dir)[0,0]*B_dir
-        #M = -np.cross(torque_perp, B_dir, axisa=0,axisb=0,axisc=0)/np.linalg.norm(self.B) #"inversion" de C=MxB
-        M = np.array([[0],[0],[0]]) #pour l'instant, pas de commande selon les roues
-        dw = -torque
+
+        M = -(1-self.rwRatio)*self.stabMT(self.Q,self.W,Qt,self.B,self.I)
+
+        dw = -self.rwRatio*self.stabRW(self.Q,self.W,Qt,self.B,self.I)
+
         return dw, M
