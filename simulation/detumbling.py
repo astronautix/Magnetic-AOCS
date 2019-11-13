@@ -28,13 +28,12 @@ J = 1 # moment d'inertie des Ri
 # Environnement :
 t=0
 orbite = Orbit(0, pi/4, 0.6, 5, 100)
-environnement = Environment(100)  #valeur de mu_e plus élevée pour que le champ ne soit pas trop faible
+environnement = Environment('dipole')  #il faudrait une valeur de mu_e plus élevée pour que le champ ne soit pas trop faible
 
 # Initialisation du champ magnétique:
 orbite.setTime(t)
 environnement.setPosition(orbite.getPosition())
-B = environnement.getEnvironment() #dans le référentiel géocentrique
-B = np.dot(orbite.A_xs(), np.dot(orbite.A_sy(), B)) # dans le référentiel du satellite
+B = 100*environnement.getEnvironment()  # dans le référentiel du satellite
 
 ## Initialisation graphique ###
 
@@ -66,8 +65,10 @@ while True:
     t+=dt
     orbite.setTime(0.05*t)
     environnement.setPosition(orbite.getPosition())
-    B = environnement.getEnvironment() #dans le référentiel géocentrique
+    # Avec un modèle analytique relativement grossier :
+    B = 100*environnement.getEnvironment() #dans le référentiel géocentrique
     B = np.dot(orbite.A_xs(), np.dot(orbite.A_sy(), B)) # dans le référentiel du satellite
+
     b_vector.axis = 10*vp.vector(B[0][0],B[1][0],B[2][0])
 
     #B = [[1],[1],[0]] #impose constant B field for testing
@@ -86,7 +87,7 @@ while True:
 
         #print("Magnetic field:", str(np.linalg.norm(B)))
         #print("dw:", str(sim.Q.V2R(dw[:,0])), "|| M:", str(sim.Q.V2R(M[:,0])))
-        print("W :", str(W[:,0]), "|| norm :", str(np.linalg.norm(W)), "|| dw :", str(dw[:,0]))
+        print("W :", str(W[:,0]), "|| norm :", str(np.linalg.norm(W)), "|| dw :", str(dw[:,0]), "|| B :", str(B[:,0]))
 
     # Rotate: rotation de tout l'objet autour de la droite de vecteur directeur <axis> et passant par <origin>)
     satellite.rotate(angle=np.linalg.norm(W)*dt, axis=vp.vector(W[0][0],W[1][0],W[2][0]), origin=vp.vector(10,10,10))

@@ -24,8 +24,8 @@ dt=1/60
 e_1 = np.array([[1],[0],[0]])
 
 # génération des paramètres de la mission
-orbite = Orbit(0, pi/4, 0.6, 5, 1000)
-environnement = Environment()
+orbite = Orbit(0, pi/4, 0.6, 7000000, 1000)
+environnement = Environment('wmm')
 
 #vecteur champ magnétique
 B = vp.arrow(pos = vp.vector(0,0,0), axis=7.7425*ux, shaftwidth=0.2, color=vp.vector(1,1,1))
@@ -37,7 +37,7 @@ while t<20:
     r, i, u = orbite.getPosition()
     environnement.setPosition((r,i,u))
     B_ = environnement.getEnvironment()
-    B_ = np.dot(orbite.A_xs(), np.dot(orbite.A_sy(), B_))
+    print(B_)
     B.axis = 100*vp.vector(B_[0][0],B_[1][0],B_[2][0])
     values['t'].append(t)
     values['r'].append(r)
