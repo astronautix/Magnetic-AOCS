@@ -21,7 +21,7 @@ class SCAO:
         self.B = None #exprimé dans Rr
         self.delta_t = delta_t
         self.I = I #exprimé dans Rv
-        self.rwRatio = rwRatio
+        self.rwRatio = rwRatio  #ratio de reaction wheel
         self.stabRW = stabRW #retourne un vecteur dans Rv
         self.stabMT = stabMT #retourne un vecteur dans Rv
 

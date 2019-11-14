@@ -33,7 +33,7 @@ environnement = Environment('dipole')  #il faudrait une valeur de mu_e plus éle
 # Initialisation du champ magnétique:
 orbite.setTime(t)
 environnement.setPosition(orbite.getPosition())
-B = 100*environnement.getEnvironment()  # dans le référentiel du satellite
+B = 10*environnement.getEnvironment()  # dans le référentiel du satellite
 
 ## Initialisation graphique ###
 
@@ -66,7 +66,7 @@ while True:
     orbite.setTime(0.05*t)
     environnement.setPosition(orbite.getPosition())
     # Avec un modèle analytique relativement grossier :
-    B = 100*environnement.getEnvironment() #dans le référentiel géocentrique
+    B = 10*environnement.getEnvironment() #dans le référentiel géocentrique
     B = np.dot(orbite.A_xs(), np.dot(orbite.A_sy(), B)) # dans le référentiel du satellite
 
     b_vector.axis = 10*vp.vector(B[0][0],B[1][0],B[2][0])

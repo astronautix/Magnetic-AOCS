@@ -31,11 +31,11 @@ def PIDMT(P, D, dP):
         angle = np.dot(np.transpose(Tr),B)
         angle = acos(np.linalg.norm(angle)/(np.linalg.norm(Tr)*np.linalg.norm(B)))
         dir = dir/np.linalg.norm(dir)*angle
-        error = 0*Q.R2V(P*dir)
+        error = 0*Q.R2V(P*dir) #pour l'instant on ne contrôle que l'attitude
 
         #derivative term
         spareW = W - np.dot(np.transpose(W),B/np.linalg.norm(B))*B/np.linalg.norm(B)
-        error = Q.R2V(D*spareW)
+        error += Q.R2V(D*spareW)
 
         #moment à appliquer
         torque = -np.dot(I,error)
