@@ -26,7 +26,7 @@ class Orbit:
         omega: argument of periapsis, measured from the ascending node
         i    : inclination between orbital and reference frame
         e    : eccentricity
-        r_p  : periapsis
+        r_p  : periapsis, en m
         tau  : time when the satellite crosses the periapsis
         t    : time
         u : omega + theta, where theta the true eccentricity is
@@ -60,12 +60,14 @@ class Orbit:
         Return r, i and u.
         """
         n = sqrt(self.mu/self.a**3)
-        #solving Kepler's equation to find the eccentric anomaly
-        E = fsolve(lambda x : x - self.e*sin(x) - n*(self.t-self.tau), 0)
+        M = n*(self.t-self.tau)
+        #solving Kepler's equation to find the eccentric anomaly, with E_0 = M - sign(M)e
+        E = fsolve(lambda x : x - self.e*sin(x) - M, M - np.sign(M)*self.e)
         theta = 2*atan(sqrt((1+self.e)/(1-self.e))*tan(E/2))
         self.u = self.omega+theta
         return self.radius(theta), self.i, self.u
 
+    #============================== transfer matrixes ==================================================
     def A_sx(self): #V_s = A_sx . V_x
         cu = cos(self.u)
         su = sin(self.u)

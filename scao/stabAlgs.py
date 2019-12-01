@@ -31,7 +31,11 @@ def PIDMT(P, D, dP):
         angle = acos(np.linalg.norm(angle)/(np.linalg.norm(Tr)*np.linalg.norm(B)))
         dir = -np.cross(Tr,B,axisa=0,axisb=0,axisc=0)
         dir = dir/np.linalg.norm(dir)*angle
+<<<<<<< HEAD
         error = Q.R2V(P*dir)
+=======
+        error = 0*Q.R2V(P*dir) #pour l'instant on ne contrôle que l'attitude
+>>>>>>> e26fc51d16ecd6a5297a166e9b465dd43aaad8fc
 
         #derivative term
         spareW = W - np.dot(np.transpose(W),B/np.linalg.norm(B))*B/np.linalg.norm(B)
