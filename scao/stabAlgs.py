@@ -27,19 +27,18 @@ def PIDMT(P, D, dP):
         Tv = Qt.R2V(B)
         Tr = Q.V2R(Tv)
 
-        dir = np.cross(Tr,B,axisa=0,axisb=0,axisc=0)
         angle = np.dot(np.transpose(Tr),B)
         angle = acos(np.linalg.norm(angle)/(np.linalg.norm(Tr)*np.linalg.norm(B)))
+        dir = -np.cross(Tr,B,axisa=0,axisb=0,axisc=0)
         dir = dir/np.linalg.norm(dir)*angle
-        error = 0*Q.R2V(P*dir)
+        error = Q.R2V(P*dir)
 
         #derivative term
         spareW = W - np.dot(np.transpose(W),B/np.linalg.norm(B))*B/np.linalg.norm(B)
-        error = Q.R2V(D*spareW)
+        error += Q.R2V(D*spareW)
 
         #moment à appliquer
         torque = -np.dot(I,error)
 
         return torque #dans le refrentiel Rv
-
     return res

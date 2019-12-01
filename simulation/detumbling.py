@@ -63,14 +63,15 @@ stab = SCAO(PIDRW(3,3,2),PIDMT(3,3,2),0,I,J,dt)
 nbit = 0
 Wr = []
 while True:
-    t+=dt
-    orbite.setTime(0.05*t)
-    environnement.setPosition(orbite.getPosition())
-    B = environnement.getEnvironment() #dans le référentiel géocentrique
-    B = np.dot(orbite.A_xs(), np.dot(orbite.A_sy(), B)) # dans le référentiel du satellite
-    b_vector.axis = 10*vp.vector(B[0][0],B[1][0],B[2][0])
-
-    #B = [[1],[1],[0]] #impose constant B field for testing
+    if 1:
+        t+=dt
+        orbite.setTime(0.1*t)
+        environnement.setPosition(orbite.getPosition())
+        B = environnement.getEnvironment() #dans le référentiel géocentrique
+        B = np.dot(orbite.A_xs(), np.dot(orbite.A_sy(), B))/np.linalg.norm(B) # dans le référentiel du satellite
+        b_vector.axis = 10*vp.vector(B[0][0],B[1][0],B[2][0])
+    else:
+        B = [[0],[0],[1]] if nbit <= 500 else [[0],[1],[0]] #impose constant B field for testing
 
     W = sim.getNextIteration(M,dw,J,B,I) # on récupère le prochain vecteur rotation
     Wr.append(np.linalg.norm(W))
