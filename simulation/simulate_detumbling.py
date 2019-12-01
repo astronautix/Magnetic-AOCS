@@ -14,34 +14,74 @@ import matplotlib.pyplot as plt
 def rd():
     return 2*(random()-0.5)
 
+################
+## Paramètres ##
+################
+
+## Satellite:
+#============
+# Geometry
 lx,ly,lz = 10,10,10
 m = 1
 dt = 1/60
+J = 1 # reaction wheels moment of inertia
+
+# Hardware
+n_windings = 400
+A_coils = 8.64e-3
+M_max = 0.13
+
+## Mission
+#=========
+
+#Orbit
+omega = 0
+i = pi/6
+e = 0.01
+r_p = 7e6
+mu = 100
+tau = 0
+
+#Environment
+B_model = 'wmm'
+
+# Target Attitude
+Q_target = np.array([[0.5],[0.5],[0.5],[0.5]])
+
+
+####################
+## Initialisation ##
+####################
+
+t=0
+t_max = 30
+
+# Satellite
 I = np.diag((m*(ly**2+lz**2)/3,m*(lx**2+lz**2)/3,m*(lx**2+ly**2)/3)) # Tenseur inertie du satellite
 W0 = 0.5*np.array([[rd()],[rd()],[rd()]]) #rotation initiale dans le référentiel R_r
 L0 = np.dot(I,W0) # Moment cinétique initial !! Attention à bien vérifier que tout est dans le bon référentiel !!
 dw = np.array([[0.],[0.],[0.]]) # vecteur de l'accélération angulaire des RW
 M = np.array([[0.],[0.],[0.]]) # vecteur du moment magnétique des bobines
-J = 1 # moment d'inertie des Ri
+hardW = Hardware(n_windings, A_coils, M_max)
 
-
-# Environnement :
-t=0
-orbite = Orbit(0, pi/4, 0, 7e6, 100)
-environnement = Environment('wmm')
-hardW = Hardware(400,8.64e-3,0.13) #n (number), A (m^2), M_max (A.m^2)
+# Environnement
+orbite = Orbit(omega, i, e, r_p, mu, tau)
+environnement = Environment(B_model)
 
 # Initialisation du champ magnétique:
 orbite.setTime(t)
 environnement.setPosition(orbite.getPosition())
 B = environnement.getEnvironment()  # dans le référentiel du satellite
 
+# Simulation
 sim = Simulator(dt,L0) #on créée un objet sim qui fera les simus
 stab = SCAO(PIDRW(3,3,2),PIDMT(3,3,2),0,I,J,dt)
 nbit = 0
 
-values = {'W':[], 'B':[], 't':[], 'M':[]}
-while t<300:
+# Valeurs
+values = {'W':[], 'B':[], 't':[], 'M':[], 'i': []}
+
+while t<t_max:
     t+=dt
     orbite.setTime(t) #0.05*t
     environnement.setPosition(orbite.getPosition())
@@ -60,8 +100,8 @@ while t<300:
 
     if nbit >= 50: #ne lance pas immediatement le detumbling
         # Calculer les corrections
-        dw, M = stab.getCommand(np.array([[0.5],[0.5],[0.5],[0.5]])) #dans Rv
-        M, _ = hardW.getRealMoment(dw, M)
+        dw, M = stab.getCommand(Q_target) #dans Rv
+        M, current = hardW.getRealMoment(dw, M)
 
         #print("Magnetic field:", str(np.linalg.norm(B)))
         #print("dw:", str(sim.Q.V2R(dw[:,0])), "|| M:", str(sim.Q.V2R(M[:,0])))
@@ -72,4 +112,5 @@ while t<300:
     values['B'].append(B)
     values['t'].append(t)
     values['M'].append(M)
+    values['i'].append(current)
     nbit += 1
