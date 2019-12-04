@@ -58,6 +58,8 @@ class Quaternion:
 
     def axis(self):
         res = np.array([[self.b],[self.c],[self.d]])
+        if np.linalg.norm(res) == 0:
+            return np.array([[1],[0],[0]])
         return res/np.linalg.norm(res)
 
     def angle(self):

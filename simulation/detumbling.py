@@ -5,7 +5,7 @@ import vpython as vp
 from math import *
 import numpy as np
 from scao.scao import SCAO
-from scao.stabAlgs import PIDRW, PIDMT
+from scao.stabAlgs import PIDRW, PIDMT3
 from environnement.environment import Environment
 from environnement.orbit import Orbit
 from hardware.hardware import Hardware
@@ -17,9 +17,9 @@ def rd():
 
 lx,ly,lz = 10,10,10
 m = 1
-dt = 1/50
+dt = 1/25
 I = np.diag((m*(ly**2+lz**2)/3,m*(lx**2+lz**2)/3,m*(lx**2+ly**2)/3)) # Tenseur inertie du satellite
-W0 = 0.5*np.array([[rd()],[rd()],[rd()]]) #rotation initiale dans le référentiel R_r
+W0 = 0*np.array([[rd()],[rd()],[rd()]]) #rotation initiale dans le référentiel R_r
 L0 = np.dot(I,W0) # Moment cinétique initial !! Attention à bien vérifier que tout est dans le bon référentiel !!
 dw = np.array([[0.],[0.],[0.]]) # vecteur de l'accélération angulaire des RW
 M = np.array([[0.],[0.],[0.]]) # vecteur du moment magnétique des bobines
@@ -60,19 +60,19 @@ b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(B[0][0],B[1][0],B
 
 
 sim = Simulator(dt,L0) #on créée un objet sim qui fera les simus
-stab = SCAO(PIDRW(3,3,2),PIDMT(3,3,2),0,I,J,dt)
+stab = SCAO(PIDRW(3,3,2),PIDMT3(0.01,50,100),0,I,J,dt)
 nbit = 0
 Wr = []
+
+qs = []
+
 while True:
-    if 1:
-        t+=dt
-        orbite.setTime(0.1*t)
-        environnement.setPosition(orbite.getPosition())
-        B = environnement.getEnvironment() #dans le référentiel géocentrique
-        B = np.dot(orbite.A_xs(), np.dot(orbite.A_sy(), B))/np.linalg.norm(B) # dans le référentiel du satellite
-        b_vector.axis = 10*vp.vector(B[0][0],B[1][0],B[2][0])
-    else:
-        B = [[0],[0],[1]] if nbit <= 500 else [[0],[1],[0]] #impose constant B field for testing
+    t+=dt
+    orbite.setTime(100000000*t)
+    environnement.setPosition(orbite.getPosition())
+    B = environnement.getEnvironment() #dans le référentiel géocentrique
+    B = np.dot(orbite.A_xs(), np.dot(orbite.A_sy(), B))/np.linalg.norm(B) # dans le référentiel du satellite
+    b_vector.axis = 10*vp.vector(B[0][0],B[1][0],B[2][0])
 
     W = sim.getNextIteration(M,dw,J,B,I) # on récupère le prochain vecteur rotation
     Wr.append(np.linalg.norm(W))
@@ -81,23 +81,19 @@ while True:
     stab.setRotation(W)
     stab.setMagneticField(B)
 
+    qs.append(sim.Q)
 
-    if nbit >= 50: #ne lance pas immediatement le detumbling
-        # Calculer les corrections
-        dw, M = stab.getCommand(np.array([[0.5],[0.5],[0.5],[0.5]])) #dans Rv
-        M, _ = hardW.getRealMoment(dw, M)
+    dw, M = stab.getCommand(np.array([[0.5],[0.5],[0.5],[0.5]])) #dans Rv
+    M, _ = hardW.getRealMoment(dw, M)
 
-        #print("Magnetic field:", str(np.linalg.norm(B)))
-        #print("dw:", str(sim.Q.V2R(dw[:,0])), "|| M:", str(sim.Q.V2R(M[:,0])))
-        print("W :", str(W[:,0]), "|| norm :", str(np.linalg.norm(W)), "|| dw :", str(dw[:,0]), "|| B :", str(B[:,0]))
+    #print("Magnetic field:", str(np.linalg.norm(B)))
+    #print("dw:", str(sim.Q.V2R(dw[:,0])), "|| M:", str(sim.Q.V2R(M[:,0])))
+    if nbit%10 == 0:
+        print("W :", str(W[:,0]), "|| norm :", str(np.linalg.norm(W)), "|| dw :", str(dw[:,0]), "|| B :", str(B[:,0]), "|| Q :", str(sim.Q.axis()[:,0]))
 
     # Rotate: rotation de tout l'objet autour de la droite de vecteur directeur <axis> et passant par <origin>)
     satellite.rotate(angle=np.linalg.norm(W)*dt, axis=vp.vector(W[0][0],W[1][0],W[2][0]), origin=vp.vector(10,10,10))
-    # sauvegarde des valeurs
-    values['W'].append(W)
-    values['B'].append(B)
-    values['t'].append(t)
-    values['M'].append(M)
+
     # Rate : réalise 1/dt fois la boucle par seconde
-    vp.rate(1/dt)
+    vp.rate(4000)
     nbit += 1

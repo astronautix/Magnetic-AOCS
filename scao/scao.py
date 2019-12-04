@@ -47,4 +47,4 @@ class SCAO:
 
         dw = -self.rwRatio*self.stabRW(self.Q,self.W,Qt,self.B,self.I)
 
-        return dw, M #dans Rv
+        return dw, torqueM #dans Rv

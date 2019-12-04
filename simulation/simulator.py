@@ -3,10 +3,10 @@ from scao.quaternion import Quaternion
 
 class Simulator:
 
-    def __init__(self,dt,L0,Q0 = np.array([[1.],[0.],[0.],[0.]])):
+    def __init__(self,dt,L0,Q0 = Quaternion(1,0,0,0)):
         self.t = 0 #temps écoulé
         self.dt = dt
-        self.Q = Quaternion(*Q0[:,0]) #quaternion de rotation de Rv par rapport à Rr
+        self.Q = Q0 #quaternion de rotation de Rv par rapport à Rr
         self.L = L0 #Moment cinétique du satellite dans Rr
 
     def dQ(self,W): #renvoie la dérivée du quaternion
