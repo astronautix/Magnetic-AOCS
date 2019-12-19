@@ -5,7 +5,7 @@ import vpython as vp
 from math import *
 import numpy as np
 from scao.scao import SCAO
-from scao.stabAlgs import PIDRW, PIDMT3
+from scao.stabAlgs import PIDRW, PIDMT
 from environnement.environment import Environment
 from environnement.orbit import Orbit
 from hardware.hardware import Hardware
@@ -60,7 +60,7 @@ b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(B[0][0],B[1][0],B
 
 
 sim = Simulator(dt,L0) #on créée un objet sim qui fera les simus
-stab = SCAO(PIDRW(3,3,2),PIDMT3(0.01,50,100),0,I,J,dt)
+stab = SCAO(PIDRW(3,3,2),PIDMT(0.01,50,100),0,I,J,dt)
 nbit = 0
 Wr = []
 
