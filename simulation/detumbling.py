@@ -68,7 +68,7 @@ qs = []
 
 while True:
     t+=dt
-    orbite.setTime(100000000*t)
+    orbite.setTime(100000000*t) #orbite.setTime(t)
     environnement.setPosition(orbite.getPosition())
     B = environnement.getEnvironment() #dans le référentiel géocentrique
     B = np.dot(orbite.A_xs(), np.dot(orbite.A_sy(), B))/np.linalg.norm(B) # dans le référentiel du satellite
@@ -95,5 +95,5 @@ while True:
     satellite.rotate(angle=np.linalg.norm(W)*dt, axis=vp.vector(W[0][0],W[1][0],W[2][0]), origin=vp.vector(10,10,10))
 
     # Rate : réalise 1/dt fois la boucle par seconde
-    vp.rate(4000)
+    vp.rate(4000) #vp.rate(1/dt)
     nbit += 1
