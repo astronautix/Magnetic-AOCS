@@ -27,7 +27,7 @@ omega = 0
 i = pi/6
 e = 0.01
 r_p = 7e6
-mu = 100
+mu = 3.986004418e14
 tau = 0
 
 # Environment
