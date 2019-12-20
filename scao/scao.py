@@ -40,7 +40,7 @@ class SCAO:
     def getCommand(self, Qt):
         Qt = Quaternion(*Qt[:,0])
 
-        torqueM = -(1-self.rwRatio)*self.stabMT(self.Q,self.W,Qt,self.B,self.I)
+        torqueM = (1-self.rwRatio)*self.stabMT(self.Q,self.W,Qt,self.B,self.I)
 
         dw = -self.rwRatio*self.stabRW(self.Q,self.W,Qt,self.B,self.I)
 

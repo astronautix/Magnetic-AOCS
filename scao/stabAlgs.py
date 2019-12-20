@@ -23,10 +23,10 @@ def PIDRW(P, D, dP): ## BUG: CHECK HERE FOR REF CONSISTENCY
 def PIDMT(e, kp, kv):
     def res(Q,W,Qt,B,I):
         Qr = Q*Qt.inv()
-        u = -Q.R2V((e**2*kp*Qr.axis()+e*kv*W))
+        u = Q.R2V((e**2*kp*Qr.axis()+e*kv*W))
         Bb = Q.R2V(B)
-        M = np.cross(Bb,u,axisa=0,axisb=0,axisc=0)
-        return -M
+        M = np.cross(u,Bb,axisa=0,axisb=0,axisc=0)
+        return M
     return res
 
 def PIDMT2(e, kp, kv):
