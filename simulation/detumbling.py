@@ -86,7 +86,7 @@ while True:
     orbite.setTime(t) #orbite.setTime(t)
     environnement.setPosition(orbite.getPosition())
     B = environnement.getEnvironment() #dans le référentiel géocentrique
-    B = np.dot(orbite.A_xs(), np.dot(orbite.A_sy(), B))/np.linalg.norm(B) # dans le référentiel du satellite
+
 
     # on récupère le prochain vecteur rotation (on fait ube étape dans la sim)
     W = sim.getNextIteration(M,dw,J,B,I)
