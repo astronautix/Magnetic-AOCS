@@ -64,6 +64,8 @@ class Orbit:
         E = fsolve(lambda x : x - self.e*sin(x) - M, M - np.sign(M)*self.e)
         theta = 2*atan(sqrt((1+self.e)/(1-self.e))*tan(E/2))
         self.u = self.omega+theta
+        if self.u < 0:
+            self.u = self.u+2*pi
         return self.radius(theta), self.i, self.u
 
     def getPeriod(self):

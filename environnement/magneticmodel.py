@@ -34,18 +34,20 @@ class Model:
 
     def wmmMagneticField(self):
         """
-        In Tesla, in the local orbital frame.
+        In Tesla, in the geocentrical frame of reference.
         """
         mag = wmm.wmm(self.i, self.u, self.r/1000 - 6371.0088, 2019)
-        return 1e-9*np.array([[-mag.down.values[0][0]], [mag.north.values[0][0]], [mag.east.values[0][0]]])
+        mag_orbital =  1e-9*np.array([[-mag.down.values[0][0]], [mag.north.values[0][0]], [mag.east.values[0][0]]]) #in the orbital frame
+
+        return np.dot(self.A_yx(), mag_orbital) # in the intertial frame
 
     def dipoleMagneticField(self):
         """
         In Tesla, in the local orbital frame.
         """
-        return np.dot(self.A_xs(), np.dot(self.A_sy(), idm(self.i, self.u, self.r)))
+        return np.dot(self.A_xs(), np.dot(self.A_sy(), idm(self.i, self.u, self.r))) #To be corrected !!!! not in the right frame
 
-    def A_sx(self): #V_s = A_sx . V_x
+    def A_sx(self): #V_s = A_sx . V_x ---
         cu = cos(self.u)
         su = sin(self.u)
         return np.array([[cu, su, 0],[-su, cu, 0],[0, 0, 1]])
@@ -60,3 +62,6 @@ class Model:
 
     def A_sy(self):
         return np.transpose(self.A_ys())
+
+    def A_yx(self):
+        return np.dot(self.A_ys(), self.A_sx())
