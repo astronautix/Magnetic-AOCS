@@ -1,10 +1,10 @@
 import numpy as np
-from math import acos
+from math import acos, sqrt
 
 class Quaternion:
 
     def __init__(self,a,b,c,d):
-        norm = a**2+b**2+c**2+d**2
+        norm = sqrt(a**2+b**2+c**2+d**2)
         self.a = a/norm
         self.b = b/norm
         self.c = c/norm
@@ -64,6 +64,10 @@ class Quaternion:
 
     def angle(self):
         return acos(max(-1,min(self.a,1)))*2
+
+    def axialPart(self):
+        res = np.array([[self.b],[self.c],[self.d]])
+        return res
 
     def V2R(self,vec):
         return np.dot(self.tm(),vec)

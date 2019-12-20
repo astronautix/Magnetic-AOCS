@@ -21,8 +21,8 @@ RW_P = 3
 RW_dP = 2
 RW_D = 3
 MT_e = 0.0005
-MT_P = 50
-MT_D = 100
+MT_P = 50*MT_e**2
+MT_D = 100*MT_e
 
 # Hardware
 n_windings = 400
