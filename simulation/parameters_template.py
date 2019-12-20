@@ -20,10 +20,9 @@ Qt = np.array([[0.5],[0.5],[0.5],[0.5]]) #quaternion objectif
 RW_P = 3
 RW_dP = 2
 RW_D = 3
-MT_e = 0.005
-MT_P = 50*MT_e**2
+MT_P = 50000
 MT_dP = 2
-MT_D = 100*MT_e
+MT_D = 100000000
 
 # Hardware
 n_windings = 400

@@ -76,6 +76,8 @@ b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(B[0][0],B[1][0],B
 def plotAttitude():
     for i in range(4):
         plt.plot([dt*i/orbite.getPeriod() for i in range(len(qs))],[q.vec()[i,0] for q in qs])
+    plt.xlabel("t (orbits)")
+    plt.ylabel("Quaternion component")
     plt.show()
 
 #####################
@@ -86,7 +88,6 @@ while True:
     orbite.setTime(t) #orbite.setTime(t)
     environnement.setPosition(orbite.getPosition())
     B = environnement.getEnvironment() #dans le référentiel géocentrique
-
 
     # on récupère le prochain vecteur rotation (on fait ube étape dans la sim)
     W = sim.getNextIteration(M,dw,J,B,I)
@@ -109,7 +110,7 @@ while True:
         print("W :", str(W[:,0]), "|| norm :", str(np.linalg.norm(W)), "|| dw :", str(dw[:,0]), "|| B :", str(B[:,0]), "|| Q :", str(sim.Q.axis()[:,0]))
 
     # Actualisation de l'affichage graphique
-    b_vector.axis = 10*vp.vector(B[0][0],B[1][0],B[2][0])
+    b_vector.axis = 1e6*vp.vector(B[0][0],B[1][0],B[2][0])
     satellite.rotate(angle=np.linalg.norm(W)*dt, axis=vp.vector(W[0][0],W[1][0],W[2][0]), origin=vp.vector(10,10,10))
 
     # Rate : réalise 25 fois la boucle par seconde
