@@ -1,6 +1,7 @@
 import sys
 sys.path.append('..')
 from simulator import Simulator
+from plotters import plotAttitude
 import vpython as vp
 from math import *
 import numpy as np
@@ -15,19 +16,31 @@ import matplotlib.pyplot as plt
 def rd():
     return 2*(random()-0.5)
 
-lx,ly,lz = 10,10,10
-m = 1
-dt = 1/25
-I = np.diag((m*(ly**2+lz**2)/3,m*(lx**2+lz**2)/3,m*(lx**2+ly**2)/3)) # Tenseur inertie du satellite
+def plotAttitude(qs,dt):
+    for i in range(4):
+        plt.plot([dt*i for i in range(len(qs))],[q.vec()[i,0] for q in qs])
+    plt.show()
+
+# Paramètres de la simulation
+dt = 100000000 #pas de temps de la simulation
+fAffichage = 25 #fréquence d'affichage
+lx,ly,lz = 10,10,10 #longueur du satellit selon les axes x,y,z
+m = 1 #masse du satellite
+J = 1 # moment d'inertie des RW
 W0 = 0*np.array([[rd()],[rd()],[rd()]]) #rotation initiale dans le référentiel R_r
-L0 = np.dot(I,W0) # Moment cinétique initial !! Attention à bien vérifier que tout est dans le bon référentiel !!
+Qt = np.array([[0.5],[0.5],[0.5],[0.5]]) #quaternion objectif
+
+# Initialisation des variables de simulation
+t = 0
+nbit = 0
 dw = np.array([[0.],[0.],[0.]]) # vecteur de l'accélération angulaire des RW
 M = np.array([[0.],[0.],[0.]]) # vecteur du moment magnétique des bobines
-J = 1 # moment d'inertie des Ri
-
+I = np.diag((m*(ly**2+lz**2)/3,m*(lx**2+lz**2)/3,m*(lx**2+ly**2)/3)) # Tenseur inertie du satellite
+L0 = np.dot(I,W0)
+Wr = []
+qs = []
 
 # Environnement :
-t=0
 orbite = Orbit(0, pi/4, 0, 7e6, 100)
 environnement = Environment('wmm')
 hardW = Hardware(400,8.64e-3,0.13) #n (number), A (m^2), M_max (A.m^2)
@@ -37,63 +50,61 @@ orbite.setTime(t)
 environnement.setPosition(orbite.getPosition())
 B = environnement.getEnvironment()  # dans le référentiel du satellite
 
-## Initialisation graphique ###
+# Simulateur
+sim = Simulator(dt,L0)
 
+# Algortihmes de stabilisation
+stab = SCAO(PIDRW(3,3,2),PIDMT(5e-11,50,100),0,I,J,dt) #stabilisateur
+
+## Initialisation graphique ##
 ux = vp.vector(1,0,0)
 uy = vp.vector(0,1,0)
 uz = vp.vector(0,0,1)
-
 # trièdre (z,x,y)
 axe_x_r = vp.arrow(pos=vp.vector(0,0,0), axis=10*ux, shaftwidth=0.5, color=vp.vector(1,0,0))
 axe_y_r = vp.arrow(pos=vp.vector(0,0,0), axis=10*uy, shaftwidth=0.5, color=vp.vector(0,1,0))
 axe_z_r = vp.arrow(pos=vp.vector(0,0,0), axis=10*uz, shaftwidth=0.5, color=vp.vector(0,0,1))
-
 #création du satellite avec son repère propre
 axe_x_s = vp.arrow(pos=vp.vector(10,10,10), axis=10*ux, shaftwidth=0.1, color=vp.vector(1,0,0))
 axe_y_s = vp.arrow(pos=vp.vector(10,10,10), axis=10*uy, shaftwidth=0.1, color=vp.vector(0,1,0))
 axe_z_s = vp.arrow(pos=vp.vector(10,10,10), axis=10*uz, shaftwidth=0.1, color=vp.vector(0,0,1))
 sugarbox = vp.box(pos=vp.vector(10,10,10), size=vp.vector(lx,ly,lz), axis=vp.vector(0,0,0), up = uy)
 satellite = vp.compound([axe_x_s,axe_y_s,axe_z_s,sugarbox])
-
 #vecteur champ B
 b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(B[0][0],B[1][0],B[2][0]), shaftwidth=0.1, color=vp.vector(1,1,1))
 
-
-sim = Simulator(dt,L0) #on créée un objet sim qui fera les simus
-stab = SCAO(PIDRW(3,3,2),PIDMT(0.01,50,100),0,I,J,dt)
-nbit = 0
-Wr = []
-
-qs = []
-
 while True:
-    t+=dt
-    orbite.setTime(100000000*t) #orbite.setTime(t)
+    #on récupère la valeur actuelle du champ magnétique et on actualise l'affichage du champ B
+    orbite.setTime(t) #orbite.setTime(t)
     environnement.setPosition(orbite.getPosition())
     B = environnement.getEnvironment() #dans le référentiel géocentrique
     B = np.dot(orbite.A_xs(), np.dot(orbite.A_sy(), B))/np.linalg.norm(B) # dans le référentiel du satellite
-    b_vector.axis = 10*vp.vector(B[0][0],B[1][0],B[2][0])
 
-    W = sim.getNextIteration(M,dw,J,B,I) # on récupère le prochain vecteur rotation
-    Wr.append(np.linalg.norm(W))
+    # on récupère le prochain vecteur rotation (on fait ube étape dans la sim)
+    W = sim.getNextIteration(M,dw,J,B,I)
+
     # Sauvegarder les valeurs de simulation actuelles:
     stab.setAttitude(sim.Q)
     stab.setRotation(W)
     stab.setMagneticField(B)
 
+    # Enregistrement de variables pour affichage
+    Wr.append(np.linalg.norm(W))
     qs.append(sim.Q)
 
-    dw, M = stab.getCommand(np.array([[0.5],[0.5],[0.5],[0.5]])) #dans Rv
+    # Prise de la commande de stabilisation
+    dw, M = stab.getCommand(Qt) #dans Rv
     M, _ = hardW.getRealMoment(dw, M)
 
-    #print("Magnetic field:", str(np.linalg.norm(B)))
-    #print("dw:", str(sim.Q.V2R(dw[:,0])), "|| M:", str(sim.Q.V2R(M[:,0])))
+    #affichage de données toute les 10 itérations
     if nbit%10 == 0:
         print("W :", str(W[:,0]), "|| norm :", str(np.linalg.norm(W)), "|| dw :", str(dw[:,0]), "|| B :", str(B[:,0]), "|| Q :", str(sim.Q.axis()[:,0]))
 
-    # Rotate: rotation de tout l'objet autour de la droite de vecteur directeur <axis> et passant par <origin>)
+    # Actualisation de l'affichage graphique
+    b_vector.axis = 10*vp.vector(B[0][0],B[1][0],B[2][0])
     satellite.rotate(angle=np.linalg.norm(W)*dt, axis=vp.vector(W[0][0],W[1][0],W[2][0]), origin=vp.vector(10,10,10))
 
-    # Rate : réalise 1/dt fois la boucle par seconde
-    vp.rate(4000) #vp.rate(1/dt)
+    # Rate : réalise 25 fois la boucle par seconde
+    vp.rate(fAffichage) #vp.rate(1/dt)
     nbit += 1
+    t+=dt
