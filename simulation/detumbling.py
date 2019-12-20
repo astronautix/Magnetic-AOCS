@@ -1,5 +1,7 @@
 import sys
 sys.path.append('..')
+import os
+import shutil
 import vpython as vp
 from math import *
 import numpy as np
@@ -9,52 +11,14 @@ from scao.stabAlgs import PIDRW, PIDMT
 from environnement.environment import Environment
 from environnement.orbit import Orbit
 from hardware.hardware import Hardware
-from random import *
 import matplotlib.pyplot as plt
-
-####################
-# Fonctions utiles #
-####################
-def rd():
-    return 2*(random()-0.5)
-
-def plotAttitude(qs,dt):
-    for i in range(4):
-        plt.plot([dt*i for i in range(len(qs))],[q.vec()[i,0] for q in qs])
-    plt.show()
 
 ###############################
 # Paramètres de la simulation #
 ###############################
-# Temps
-dt = 100000000 #pas de temps de la simulation
-fAffichage = 25 #fréquence d'affichage
-
-# Géométrie
-lx,ly,lz = 10,10,10 #longueur du satellit selon les axes x,y,z
-m = 1 #masse du satellite
-
-# Mouvement
-W0 = 0*np.array([[rd()],[rd()],[rd()]]) #rotation initiale dans le référentiel R_r
-Qt = np.array([[0.5],[0.5],[0.5],[0.5]]) #quaternion objectif
-
-# Hardware
-n_windings = 400
-A_coils = 8.64e-3
-M_max = 0.13 #Moment maximum des MT
-J = 1 # moment d'inertie des RW
-
-# Orbite
-omega = 0
-i = pi/6
-e = 0.01
-r_p = 7e6
-mu = 100
-tau = 0
-
-# Environment
-B_model = 'wmm'
-
+if (not os.path.isfile('parameters.py')):
+    shutil.copy2('parameters_template.py', 'parameters.py')
+from parameters import *
 
 ###################################
 # Initialisation de la simulation #
@@ -105,6 +69,14 @@ sugarbox = vp.box(pos=vp.vector(10,10,10), size=vp.vector(lx,ly,lz), axis=vp.vec
 satellite = vp.compound([axe_x_s,axe_y_s,axe_z_s,sugarbox])
 #vecteur champ B
 b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(B[0][0],B[1][0],B[2][0]), shaftwidth=0.1, color=vp.vector(1,1,1))
+
+####################
+# Fonctions utiles #
+####################
+def plotAttitude(qs,dt):
+    for i in range(4):
+        plt.plot([dt*i for i in range(len(qs))],[q.vec()[i,0] for q in qs])
+    plt.show()
 
 #####################
 # Boucle principale #
