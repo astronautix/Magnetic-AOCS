@@ -49,7 +49,7 @@ B = environnement.getEnvironment()  # dans le référentiel du satellite
 sim = Simulator(dt,L0)
 
 # Algortihmes de stabilisation
-stab = SCAO(PIDRW(RW_P,RW_D,RW_dP),PIDMT(MT_P,MT_D),0,I,J,dt) #stabilisateur
+stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMT(MT_P,MT_dP,MT_D),0,I,J,dt) #stabilisateur
 
 ############################
 # Initialisation graphique #
@@ -73,9 +73,9 @@ b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(B[0][0],B[1][0],B
 ####################
 # Fonctions utiles #
 ####################
-def plotAttitude(qs,dt):
+def plotAttitude():
     for i in range(4):
-        plt.plot([dt*i for i in range(len(qs))],[q.vec()[i,0] for q in qs])
+        plt.plot([dt*i/orbite.getPeriod() for i in range(len(qs))],[q.vec()[i,0] for q in qs])
     plt.show()
 
 #####################

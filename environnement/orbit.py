@@ -54,7 +54,6 @@ class Orbit:
         """
         return self.a*(1-self.e**2)/(1+self.e*cos(theta))
 
-
     def getPosition(self):
         """
         Return r, i and u.
@@ -66,6 +65,9 @@ class Orbit:
         theta = 2*atan(sqrt((1+self.e)/(1-self.e))*tan(E/2))
         self.u = self.omega+theta
         return self.radius(theta), self.i, self.u
+
+    def getPeriod(self):
+        return sqrt(self.a**3*4*pi**2/self.mu)
 
     #============================== transfer matrixes ==================================================
     def A_sx(self): #V_s = A_sx . V_x
