@@ -17,12 +17,13 @@ W0 = 0*np.array([[2*(random()-0.5)] for i in range(3)]) #rotation initiale dans 
 Qt = np.array([[0.5],[0.5],[0.5],[0.5]]) #quaternion objectif
 
 # SCAO parameters
+SCAOratio = 0
 RW_P = 3
 RW_dP = 2
 RW_D = 3
-MT_P = 50000
+MT_P = 5e3
 MT_dP = 2
-MT_D = 100000000
+MT_D = 2e7
 
 # Hardware
 n_windings = 400

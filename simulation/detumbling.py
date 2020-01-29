@@ -49,7 +49,7 @@ B = environnement.getEnvironment()  # dans le référentiel du satellite
 sim = Simulator(dt,L0)
 
 # Algortihmes de stabilisation
-stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMT(MT_P,MT_dP,MT_D),0,I,J,dt) #stabilisateur
+stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMT(MT_P,MT_dP,MT_D),SCAOratio,I,J,dt) #stabilisateur
 
 ############################
 # Initialisation graphique #
@@ -107,7 +107,7 @@ while True:
 
     #affichage de données toute les 10 itérations
     if nbit%10 == 0:
-        print("W :", str(W[:,0]), "|| norm :", str(np.linalg.norm(W)), "|| dw :", str(dw[:,0]), "|| B :", str(B[:,0]), "|| Q :", str(sim.Q.axis()[:,0]))
+        print("W :", str(W[:,0]), "|| norm :", str(np.linalg.norm(W)), "|| dw :", str(dw[:,0]), "|| B :", str(B[:,0]), "|| Q :", str(sim.Q.axis()[:,0]), "|| M :", str(np.linalg.norm(M)))
 
     # Actualisation de l'affichage graphique
     b_vector.axis = 1e6*vp.vector(B[0][0],B[1][0],B[2][0])
