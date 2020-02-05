@@ -13,7 +13,21 @@ imu = mpu9250.IMU(enable_dmp = True, dmp_sample_rate = 100, enable_magnetometer 
 mot = motor.Motor(1)
 
 # Algortihmes de stabilisation
-stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMT(MT_P,MT_dP,MT_D),SCAOratio,I,J,dt) #stabilisateur
+
+lx,ly,lz = 10,10,10 #longueur du satellit selon les axes x,y,z
+m = 1 #masse du satellite
+M = np.array([[0.],[0.],[0.]]) # vecteur du moment magnétique des bobines
+I = np.diag((m*(ly**2+lz**2)/3,m*(lx**2+lz**2)/3,m*(lx**2+ly**2)/3)) # Tenseur inertie du satellite
+J = 1 # moment d'inertie des RW
+SCAOratio = 0
+RW_P = 3
+RW_dP = 2
+RW_D = 3
+MT_P = 5e3
+MT_dP = 2
+MT_D = 2e7
+
+stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMT(MT_P,MT_dP,MT_D),SCAOratio,I,J) #stabilisateur
 
 M = 0
 
