@@ -4,7 +4,7 @@ from math import acos, asin
 
 class SCAO:
 
-    def __init__(self, stabRW, stabMT, rwRatio, I, J, delta_t):
+    def __init__(self, stabRW, stabMT, rwRatio, I, J):
         """
         listQ: liste des attitudes dans Rr
         listL: liste des moments cinétiques dans Rr
@@ -19,7 +19,6 @@ class SCAO:
         self.Q = None #exprimé dans Rr
         self.W = None #exprimé dans Rr
         self.B = None #exprimé dans Rr
-        self.delta_t = delta_t
         self.I = I #exprimé dans Rv
         self.rwRatio = rwRatio  #ratio de reaction wheel
         self.stabRW = stabRW #retourne un vecteur dans Rv
