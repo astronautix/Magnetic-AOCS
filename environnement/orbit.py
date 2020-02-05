@@ -29,8 +29,8 @@ class Orbit:
         r_p  : periapsis, en m
         tau  : time when the satellite crosses the periapsis
         t    : time
-        u : omega + theta, where theta the true eccentricity is
-        mu : gravitationnal constant
+        u    : omega + theta, where theta the true eccentricity is ; argument of latitude
+        mu   : gravitationnal constant
         """
         self.mu = mu
         self.Omega = 0 #on considère pour le moment que le noeud ascendant est situé sur le 1er axe du réf. fixe
