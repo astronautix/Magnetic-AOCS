@@ -49,7 +49,7 @@ B = environnement.getEnvironment()  # dans le référentiel du satellite
 sim = Simulator(dt,L0)
 
 # Algortihmes de stabilisation
-stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMT(MT_P,MT_dP,MT_D),SCAOratio,I,J,dt) #stabilisateur
+stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMT(MT_P,MT_dP,MT_D),SCAOratio,I,J) #stabilisateur
 
 ############################
 # Initialisation graphique #
