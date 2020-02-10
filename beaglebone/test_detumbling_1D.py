@@ -12,7 +12,6 @@ import rcpy.motor as motor
 from flask import Flask
 from multiprocessing import Process
 
-app=Flask(__name__)
 
 imu = mpu9250.IMU(enable_dmp = True, dmp_sample_rate = 100, enable_magnetometer = True)
 mot = motor.Motor(1)
@@ -34,55 +33,53 @@ MT_D = 50000
 
 stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMT(MT_P,MT_dP,MT_D),SCAOratio,I,J) #stabilisateur
 
-M = np.array([[0],[0],[0]])
-
 Qt = Quaternion(.5,.5,.5,.5)
-
-Q = Quaternion(1,0,0,0)
-
-W = np.array([[0],[0],[0]])
-
-B = np.array([[0],[0],[0]])
-
-
-@app.route('/')
-def index():
-    global M, Q, W, B
-    return str(M) + "<br/>" + str(Q) + "<br/>" + str(W) + "<br/>" + str(B)
-
-def launchServer():
-    app.run(host='0.0.0.0')
-
-server = Process(target=launchServer)
-server.start()
 
 class Runner(Process):
     def __init__(self):
         Process.__init__()
-        self.M = 
+        self.M = np.array([[0],[0],[0]])
+        self.W = np.array([[0],[0],[0]])
+        self.B = np.array([[0],[0],[0]])
+        self.Q = Quaternion(1,0,0,0)
 
-while True:
-    global M, Q, W, B
-    mot.set(0)
-    time.sleep(.05)
-    state = imu.read()
+    def loop(self):
+            mot.set(0)
+            time.sleep(.05)
+            state = imu.read()
 
-    Q = Quaternion(*state['quat'])
-    W = Q.V2R(np.array([[i*pi/360] for i in state['gyro']]))
-    B = Q.V2R(np.array([[i*10**-6] for i in state['mag']]))
+            self.Q = Quaternion(*state['quat'])
+            self.W = self.Q.V2R(np.array([[i*pi/360] for i in state['gyro']]))
+            self.B = self.Q.V2R(np.array([[i*10**-6] for i in state['mag']]))
 
-    mot.set(max(-1,min(-M[1],1)))
+            mot.set(max(-1,min(-self.M[1],1)))
 
-    # Sauvegarder les valeurs actuelles:
-    stab.setAttitude(Q)
-    stab.setRotation(W)
-    stab.setMagneticField(B)
+            # Sauvegarder les valeurs actuelles:
+            stab.setAttitude(self.Q)
+            stab.setRotation(self.W)
+            stab.setMagneticField(self.B)
 
-    # Prise de la commande de stabilisation
-    dw, M = stab.getCommand(Qt) #dans Rv
+            # Prise de la commande de stabilisation
+            dw, self.M = stab.getCommand(Qt) #dans Rv
 
-    mot.set(max(-1,min(-M[1],1)))
+            mot.set(max(-1,min(-M[1],1)))
 
-    print("=======================\n\n\n===================\n", "M :", str(M[:,0]), "\n W :" , str(W[:,0]), "\n Q :", str(Q.vec()[:,0]), "\n B :", str(B[:,0]))
+            print("=======================\n\n\n===================\n", "M :", str(self.M[:,0]), "\n W :" , str(self.W[:,0]), "\n Q :", str(self.Q.vec()[:,0]), "\n B :", str(self.B[:,0]))
 
-    time.sleep(.2)
+            time.sleep(.2)
+
+    def run(self):
+        while True:
+            self.loop()
+
+runner = Runner()
+runner.start()
+
+app=Flask(__name__)
+
+@app.route('/')
+def index():
+    return str(runner.M)
+
+def launchServer():
+    app.run(host='0.0.0.0')
