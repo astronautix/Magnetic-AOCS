@@ -9,6 +9,10 @@ from scao.scao import SCAO
 from scao.stabAlgs import PIDRW, PIDMT
 import rcpy.mpu9250 as mpu9250
 import rcpy.motor as motor
+from flask import Flask
+from multiprocessing import Process
+
+app=Flask(__name__)
 
 imu = mpu9250.IMU(enable_dmp = True, dmp_sample_rate = 100, enable_magnetometer = True)
 mot = motor.Motor(1)
@@ -34,8 +38,31 @@ M = np.array([[0],[0],[0]])
 
 Qt = Quaternion(.5,.5,.5,.5)
 
-while True:
+Q = Quaternion(1,0,0,0)
 
+W = np.array([[0],[0],[0]])
+
+B = np.array([[0],[0],[0]])
+
+
+@app.route('/')
+def index():
+    global M, Q, W, B
+    return str(M) + "<br/>" + str(Q) + "<br/>" + str(W) + "<br/>" + str(B)
+
+def launchServer():
+    app.run(host='0.0.0.0')
+
+server = Process(target=launchServer)
+server.start()
+
+class Runner(Process):
+    def __init__(self):
+        Process.__init__()
+        self.M = 
+
+while True:
+    global M, Q, W, B
     mot.set(0)
     time.sleep(.05)
     state = imu.read()
