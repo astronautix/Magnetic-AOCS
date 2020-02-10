@@ -4,7 +4,7 @@ from math import acos, cos, pi, sin
 
 def PIDRW(P, dP, D): ## BUG: CHECK HERE FOR REF CONSISTENCY
     def res(Q,W,Qt,B,I):
-        #Qt = targeted attitude /!\ N'est pas un objet Quaternion (mais un quaternion formel)
+        #Qt = targeted attitude
         Qr = Qt*Q.inv() #quaternion relatif qui effectue la rotation depuis Q vers Qt
         dynamicalP = P/(1+np.linalg.norm(W))**dP #dynamical P-factor
         u = Q.R2V(dynamicalP*Qr.axialPart() - D*W) #REMPLACER Qr.angle()*Qr.axis() par Qr.axialPart()!!
