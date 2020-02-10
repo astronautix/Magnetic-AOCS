@@ -12,7 +12,7 @@ from environnement.environment import Environment
 from environnement.orbit import Orbit
 from hardware.hardware import Hardware
 import matplotlib.pyplot as plt
-
+from scao.quaternion import Quaternion
 ###############################
 # Paramètres de la simulation #
 ###############################
@@ -102,7 +102,7 @@ while True:
     qs.append(sim.Q)
 
     # Prise de la commande de stabilisation
-    dw, M = stab.getCommand(Qt) #dans Rv
+    dw, M = stab.getCommand(Quaternion(Qt[0][0], Qt[1][0], Qt[2][0], Qt[3][0])) #dans Rv
     M, _ = hardW.getRealMoment(dw, M)
 
     #affichage de données toute les 10 itérations
