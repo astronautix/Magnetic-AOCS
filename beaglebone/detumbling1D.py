@@ -10,8 +10,10 @@ from scao.stabAlgs import PIDRW, PIDMT
 import rcpy.mpu9250 as mpu9250
 import rcpy.motor as motor
 from flask import Flask
-from multiprocessing import Process
-
+from threading import Thread
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 imu = mpu9250.IMU(enable_dmp = True, dmp_sample_rate = 100, enable_magnetometer = True)
 mot = motor.Motor(1)
@@ -35,9 +37,9 @@ stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMT(MT_P,MT_dP,MT_D),SCAOratio,I,J) #stabil
 
 Qt = Quaternion(.5,.5,.5,.5)
 
-class Runner(Process):
+class Runner(Thread):
     def __init__(self):
-        Process.__init__()
+        Thread.__init__(self)
         self.M = np.array([[0],[0],[0]])
         self.W = np.array([[0],[0],[0]])
         self.B = np.array([[0],[0],[0]])
@@ -62,9 +64,9 @@ class Runner(Process):
             # Prise de la commande de stabilisation
             dw, self.M = stab.getCommand(Qt) #dans Rv
 
-            mot.set(max(-1,min(-M[1],1)))
+            mot.set(max(-1,min(-self.M[1],1)))
 
-            print("=======================\n\n\n===================\n", "M :", str(self.M[:,0]), "\n W :" , str(self.W[:,0]), "\n Q :", str(self.Q.vec()[:,0]), "\n B :", str(self.B[:,0]))
+            #print("=======================\n\n\n===================\n", "M :", str(self.M[:,0]), "\n W :" , str(self.W[:,0]), "\n Q :", str(self.Q.vec()[:,0]), "\n B :", str(self.B[:,0]))
 
             time.sleep(.2)
 
@@ -79,7 +81,11 @@ app=Flask(__name__)
 
 @app.route('/')
 def index():
-    return str(runner.M)
+    state = imu.read()
 
-def launchServer():
-    app.run(host='0.0.0.0')
+    Q = Quaternion(*state['quat'])
+    W = Q.V2R(np.array([[i*pi/360] for i in state['gyro']]))
+
+    return repr(runner.M)+"<br/>"+repr(W)+"<br/>"+repr(runner.B)+"<br/>"+repr(Q.vec())
+
+app.run(host='0.0.0.0')
