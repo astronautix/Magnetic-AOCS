@@ -20,7 +20,7 @@ mot = motor.Motor(1)
 
 # Algortihmes de stabilisation
 
-lx,ly,lz = 10,10,10 #longueur du satellit selon les axes x,y,z
+lx,ly,lz = 0.1,0.1,0.1 #longueur du satellit selon les axes x,y,z
 m = 1 #masse du satellite
 M = np.array([[0.],[0.],[0.]]) # vecteur du moment magnétique des bobines
 I = np.diag((m*(ly**2+lz**2)/3,m*(lx**2+lz**2)/3,m*(lx**2+ly**2)/3)) # Tenseur inertie du satellite
