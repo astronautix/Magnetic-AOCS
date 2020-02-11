@@ -1,21 +1,19 @@
-import numpy as np
+from hardware.customcoil import CustomCoil
 
 
-class Magnetorquers:
+class Magnetorquer:
 
-    def __init__(self, n, A, M_max):
-        self.n = n
-        self.A = A
-        self.M_max = M_max
+    def __init__(self, model, parameters):
+        self.parameters = parameters
+        self.model = model
+        self.functions = {'custom coil' : CustomCoil} #parameters for custom coil:  (r_coil, r_wire, n_coils, mu_rel, U_max)
+        try:
+            self.magnetorquer = self.functions[self.model](self.parameters)
+        except ValueError:
+            print("Les paramètres en entrée ne correspondent pas au modèle choisi!")
 
-    def currentConsumption(self, M):
-        return M/(self.n*self.A) #most basic relation - can be improved
+    def getRealCommand(self, M): #M is a scalar
+        return self.magnetorquer.getRealCommand(M)
 
-    def getMoment(self, M_target):
-        """
-        Return the real momentum and the current required to do it.
-        """
-        M_t = np.linalg.norm(M_target)
-        if M_t > self.M_max:
-            M_target = M_target*self.M_max/M_t #"normalization"
-        return M_target, int(sum(list(map(lambda x : self.currentConsumption(x), M_target))))
+    def getMmax(self):
+        return self.magnetorquer.M_max
