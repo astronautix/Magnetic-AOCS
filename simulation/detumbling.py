@@ -10,7 +10,7 @@ from scao.scao import SCAO
 from scao.stabAlgs import PIDRW, PIDMT
 from environnement.environment import Environment
 from environnement.orbit import Orbit
-from hardware.hardware import Hardware
+from hardware.hardwares import Hardware
 import matplotlib.pyplot as plt
 from scao.quaternion import Quaternion
 ###############################
@@ -38,7 +38,7 @@ orbite = Orbit(omega, i, e, r_p, mu, tau)
 environnement = Environment(B_model)
 
 # Hardware
-hardW = Hardware(n_windings, A_coils, M_max)
+hardW = Hardware(mgt_parameters, 'custom coil') 
 
 # Initialisation du champ magnétique:
 orbite.setTime(t)
@@ -83,6 +83,7 @@ def plotAttitude():
 #####################
 # Boucle principale #
 #####################
+output = {'t':[], 'M':[], 'U':[]}
 while True:
     #on récupère la valeur actuelle du champ magnétique et on actualise l'affichage du champ B
     orbite.setTime(t) #orbite.setTime(t)
@@ -103,7 +104,7 @@ while True:
 
     # Prise de la commande de stabilisation
     dw, M = stab.getCommand(Quaternion(Qt[0][0], Qt[1][0], Qt[2][0], Qt[3][0])) #dans Rv
-    M, _ = hardW.getRealMoment(dw, M)
+    U, M = hardW.getRealCommand(dw, M)
 
     #affichage de données toute les 10 itérations
     if nbit%10 == 0:
@@ -117,3 +118,6 @@ while True:
     vp.rate(fAffichage) #vp.rate(1/dt)
     nbit += 1
     t+=dt
+    output['t'].append(t)
+    output['M'].append(M)
+    output['U'].append(U)
