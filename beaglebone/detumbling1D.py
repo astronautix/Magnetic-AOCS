@@ -42,37 +42,34 @@ class Runner(Thread):
         Thread.__init__(self)
         self.M = np.array([[0],[0],[0]])
         self.W = np.array([[0],[0],[0]])
+        self.Bv = np.array([[0],[0],[0]])
         self.B = np.array([[0],[0],[0]])
         self.Q = Quaternion(1,0,0,0)
 
-    def loop(self):
-            mot.set(0)
-            time.sleep(.05)
-            state = imu.read()
-
-            self.Q = Quaternion(*state['quat'])
-            self.W = self.Q.V2R(np.array([[i*pi/360] for i in state['gyro']]))
-            self.B = self.Q.V2R(np.array([[i*10**-6] for i in state['mag']]))
-
-            mot.set(max(-1,min(-self.M[1],1)))
-
-            # Sauvegarder les valeurs actuelles:
-            stab.setAttitude(self.Q)
-            stab.setRotation(self.W)
-            stab.setMagneticField(self.B)
-
-            # Prise de la commande de stabilisation
-            dw, self.M = stab.getCommand(Qt) #dans Rv
-
-            mot.set(max(-1,min(-self.M[1],1)))
-
-            #print("=======================\n\n\n===================\n", "M :", str(self.M[:,0]), "\n W :" , str(self.W[:,0]), "\n Q :", str(self.Q.vec()[:,0]), "\n B :", str(self.B[:,0]))
-
-            time.sleep(.2)
-
     def run(self):
+        nbitBeforeMagMeasure = round(1/0.1)
         while True:
-            self.loop()
+            if nbit%nbitBeforeMagMeasure == 0:
+                mot.set(0)
+                time.sleep(.1)
+                state = imu.read()
+                self.Bv = np.array([[i*10**-6] for i in state['mag']])
+            else:
+                state = imu.read()
+                self.Q = Quaternion(*state['quat'])
+                self.W = self.Q.V2R(np.array([[i*pi/360] for i in state['gyro']]))
+                self.B = self.Q.V2R(self.Bv)
+
+                # Sauvegarder les valeurs actuelles:
+                stab.setAttitude(self.Q)
+                stab.setRotation(self.W)
+                stab.setMagneticField(self.B)
+
+                # Prise de la commande de stabilisation
+                dw, self.M = stab.getCommand(Qt) #dans Rv
+
+                mot.set(max(-1,min(-self.M[1],1)))
+                time.sleep(.1)
 
 runner = Runner()
 runner.start()
