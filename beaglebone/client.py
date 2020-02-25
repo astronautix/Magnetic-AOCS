@@ -36,7 +36,7 @@ t = []
 
 while True:
     try:
-        response = requests.get('http://192.168.8.1:5000')
+        response = requests.get('http://192.168.8.1:5000', verify=False, timeout=0.5)
         M, W, B, Q = response.text.split("<br/>")
         Q = Quaternion(*eval(Q)[:,0])
         M = eval(M)
@@ -51,5 +51,7 @@ while True:
         satellite.axis = vp.vector(*Q.V2R(array([[1],[0],[0]]))[:,0])
         satellite.up = vp.vector(*Q.V2R(array([[0],[0],[1]]))[:,0])
     except requests.exceptions.ConnectionError:
+        print('[' + str(int(time.time())) + "] Did not reached server")
+    except requests.exceptions.ReadTimeout:
         print('[' + str(int(time.time())) + "] Did not reached server")
     time.sleep(dt)
