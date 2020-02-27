@@ -17,7 +17,7 @@ class Hardware:
         if s_x or s_y or s_z:
             #checking if one of the coil would be saturated, and if so, recomputing commands
             M_norm = np.linalg.norm(M)
-            M_min  = min([x.getMmax for x in self.magnetorquers])
+            M_min  = min([x.getMmax() for x in self.magnetorquers])
             M_new = M_min*M/M_norm
             Ux, Mx, _ = self.magnetorquers[0].getRealCommand(M_new[0][0])
             Uy, My, _ = self.magnetorquers[1].getRealCommand(M_new[1][0])
