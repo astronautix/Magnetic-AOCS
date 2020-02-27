@@ -38,7 +38,7 @@ orbite = Orbit(omega, i, e, r_p, mu, tau)
 environnement = Environment(B_model)
 
 # Hardware
-hardW = Hardware(mgt_parameters, 'custom coil') 
+hardW = Hardware(mgt_parameters, 'custom coil')
 
 # Initialisation du champ magnétique:
 orbite.setTime(t)
