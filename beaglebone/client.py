@@ -30,19 +30,28 @@ satellite = vp.compound([axe_x_s,axe_y_s,axe_z_s,sugarbox])
 b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(0,0,0), shaftwidth=0.5, color=vp.vector(1,1,1))
 
 
+Ws = []
+t = []
+
+
 while True:
     try:
-        response = requests.get('http://192.168.8.1:5000')
+        response = requests.get('http://192.168.8.1:5000', verify=False, timeout=0.5)
         M, W, B, Q = response.text.split("<br/>")
         Q = Quaternion(*eval(Q)[:,0])
         M = eval(M)
         W = eval(W)
         B = eval(B)
 
+        Ws.append(W)
+        t.append(time.time())
+
         # Actualisation de l'affichage graphique
         b_vector.axis = 10*vp.vector(*B[:,0]/np.linalg.norm(B))
         satellite.axis = vp.vector(*Q.V2R(array([[1],[0],[0]]))[:,0])
         satellite.up = vp.vector(*Q.V2R(array([[0],[0],[1]]))[:,0])
     except requests.exceptions.ConnectionError:
+        print('[' + str(int(time.time())) + "] Did not reached server")
+    except requests.exceptions.ReadTimeout:
         print('[' + str(int(time.time())) + "] Did not reached server")
     time.sleep(dt)
