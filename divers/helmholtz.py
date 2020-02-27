@@ -24,6 +24,7 @@ f = lambda x : alpha*(((x+a/2)**2+a**2)**(-3/2) + ((x-a/2)**2+a**2)**(-3/2))
 
 X = np.linspace(-0.69, 0.69, 100)
 Y = f(X)
+Y = Y/max(Y)
 
 plt.plot(X,Y, label="$B$")
 plt.plot([-0.7, 0.7], [max(Y)*seuil, max(Y)*seuil], label = "$B_{max}*99\%$")
