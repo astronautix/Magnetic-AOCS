@@ -6,12 +6,16 @@ import time
 import numpy as np
 from scao.quaternion import Quaternion
 from scao.scao import SCAO
+from
 from scao.stabAlgs import PIDRW, PIDMT
 import rcpy.mpu9250 as mpu9250
 import rcpy.motor as motor
 from flask import Flask
 from threading import Thread
 import logging
+from hardware.hardwares import Hardware
+
+
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
@@ -20,7 +24,7 @@ mot = motor.Motor(1)
 
 # Algortihmes de stabilisation
 
-lx,ly,lz = 0.1,0.1,0.1 #longueur du satellit selon les axes x,y,z
+lx,ly,lz = 0.1,0.1,0.1 #longueur du satellite selon les axes x,y,z
 m = 1 #masse du satellite
 M = np.array([[0.],[0.],[0.]]) # vecteur du moment magnétique des bobines
 I = np.diag((m*(ly**2+lz**2)/3,m*(lx**2+lz**2)/3,m*(lx**2+ly**2)/3)) # Tenseur inertie du satellite
@@ -33,7 +37,20 @@ MT_P = 0
 MT_dP = 0
 MT_D = 50000
 
+#####
+# paramètres hardware
+n_windings = 500
+r_wire = 125e-6
+r_coil = 75e-4
+U_max = 5
+mu_rel = 31
+J = 1 # moment d'inertie des RW
+# r_coil, r_wire, n_coils, mu_rel, U_max
+mgt_parameters = r_coil, r_wire, n_windings, mu_rel, U_max
+#####
+
 stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMT(MT_P,MT_dP,MT_D),SCAOratio,I,J) #stabilisateur
+hardW = Hardware(mgt_parameters, 'custom coil')  #hardware (bobines custom)
 
 Qt = Quaternion(.5,.5,.5,.5)
 
@@ -41,6 +58,7 @@ class Runner(Thread):
     def __init__(self):
         Thread.__init__(self)
         self.M = np.array([[0],[0],[0]])
+        self.U = np.array([[0],[0],[0]]) #tension
         self.W = np.array([[0],[0],[0]])
         self.B = np.array([[0],[0],[0]])
         self.Q = Quaternion(1,0,0,0)
@@ -68,10 +86,11 @@ class Runner(Thread):
 
                 # Prise de la commande de stabilisation
                 dw, self.M = stab.getCommand(Qt) #dans Rv
+                self.U, self.M = hardW.getRealCommand(dw, self.M)
 
-                mot.set(max(-1,min(-self.M[1],1)))
+                mot.set(max(-1,min(-self.U[1][0]/U_max,1)))
                 time.sleep(.1)
-            nbit += 1 
+            nbit += 1
 
 runner = Runner()
 runner.start()
