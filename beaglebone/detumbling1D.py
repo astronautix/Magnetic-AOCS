@@ -21,7 +21,7 @@ log.setLevel(logging.ERROR)
 imu = mpu9250.IMU(enable_dmp = True, dmp_sample_rate = 100, enable_magnetometer = True)
 mot = motor.Motor(1)
 
-# Algortihmes de stabilisation
+# Algorithmes de stabilisation
 
 lx,ly,lz = 0.1,0.1,0.1 #longueur du satellite selon les axes x,y,z
 m = 1 #masse du satellite
