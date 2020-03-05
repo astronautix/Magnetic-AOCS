@@ -1,4 +1,4 @@
-from hardware.customcoil import CustomCoil
+from src.hardware.customcoil import CustomCoil
 
 
 class Magnetorquer:

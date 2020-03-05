@@ -1,5 +1,5 @@
 import numpy as np
-from scao.quaternion import Quaternion
+from src.scao.quaternion import Quaternion
 from math import acos, asin
 
 class SCAO:

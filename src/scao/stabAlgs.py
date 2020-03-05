@@ -1,5 +1,5 @@
 import numpy as np
-from scao.quaternion import Quaternion
+from src.scao.quaternion import Quaternion
 from math import acos, cos, pi, sin
 
 def PIDRW(P, dP, D): ## BUG: CHECK HERE FOR REF CONSISTENCY

@@ -5,8 +5,8 @@ from math import *
 import numpy as np
 # from random import *
 import matplotlib.pyplot as plt
-from orbit import Orbit
-from environment import Environment
+from src.orbit import Orbit
+from src.environment import Environment
 
 #ux = vp.vector(1,0,0)
 #uy = vp.vector(0,1,0)
@@ -64,7 +64,3 @@ while t<orbite.getPeriod():
 #            tmins[x] = min(tcur[x], tmins[x])
 #            tcur[x] = 0
 #            Bi[x] = i[x]
-            
-            
-    
-

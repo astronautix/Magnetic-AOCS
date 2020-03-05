@@ -4,7 +4,7 @@ from math import *
 import numpy as np
 from random import *
 import wmm2015 as wmm
-from environnement.magneticmodel import Model
+from src.environnement.magneticmodel import Model
 
 
 class Environment:

@@ -4,7 +4,7 @@ from math import *
 import numpy as np
 from random import *
 import wmm2015 as wmm
-from environnement.magneticdipole import idm
+from src.environnement.magneticdipole import idm
 
 class Model:
 
