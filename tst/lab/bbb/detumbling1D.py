@@ -50,7 +50,8 @@ mgt_parameters = r_coil, r_wire, n_windings, mu_rel, U_max
 stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMT(MT_P,MT_dP,MT_D),SCAOratio,I,J) #stabilisateur
 hardW = Hardware(mgt_parameters, 'custom coil')  #hardware (bobines custom)
 
-Qt = Quaternion(.5,.5,.5,.5)
+state = imu.read()
+Qt = Quaternion(*state['quat'])
 
 class Runner(Thread):
     def __init__(self):
@@ -90,7 +91,7 @@ class Runner(Thread):
 
                 mot.set(max(-1,min(-self.U[1][0]/U_max,1)))
                 time.sleep(.1)
-            self.server.queue(self.M, self.W, self.B, self.Q)
+            self.server.queue(self.M, self.W, self.B, self.Q, self.Q*Qt.inv())
             nbit += 1
 
 runner = Runner()
