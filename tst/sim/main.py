@@ -16,9 +16,9 @@ from scao.quaternion import Quaternion
 ###############################
 # Paramètres de la simulation #
 ###############################
-if (not os.path.isfile('parameters.py')):
-    shutil.copy2('parameters_template.py', 'parameters.py')
-from parameters import *
+if (not os.path.isfile('conf.py')):
+    shutil.copy2('conf.default.py', 'conf.py')
+from conf import *
 
 ###################################
 # Initialisation de la simulation #
