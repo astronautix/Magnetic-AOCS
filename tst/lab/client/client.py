@@ -38,9 +38,8 @@ ts = []
 while True:
     try:
         response = requests.get('http://192.168.8.1:5000', verify=False, timeout=0.5)
-        t, M, W, B, Q = response.text.split("<br/>")
+        t, M, W, B, Q = response.text.split("<br/><br/>")[-1].split("<br/>")
         t = eval(t)
-        print(t)
         Q = Quaternion(*eval(Q)[:,0])
         M = eval(M)
         W = eval(W)
