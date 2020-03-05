@@ -65,7 +65,7 @@ def animate(i, Qs, ts):
         # Draw x and y lists
         ax.clear()
         for i in range(4):
-            ax.plot(ts, Qs[:,i])
+            ax.plot(ts, np.array(Qs)[:,i])
 
         # Format plot
         plt.xticks(rotation=45, ha='right')
