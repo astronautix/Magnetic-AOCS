@@ -13,7 +13,7 @@ from flask import Flask
 from threading import Thread
 import logging
 from src.hardware.hardwares import Hardware
-
+from server import Server
 
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
