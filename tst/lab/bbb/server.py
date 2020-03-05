@@ -13,7 +13,7 @@ class Server:
         self.buffer.append(str(ts)+"<br/>"+repr(runner.M)+"<br/>"+repr(W)+"<br/>"+repr(runner.B)+"<br/>"+repr(Q.vec()))
         self.timestamps.append(ts)
 
-    @app.route('/')
+    @self.app.route('/')
     def index():
         return '<br/><br/>'.join(self.buffer)
 
