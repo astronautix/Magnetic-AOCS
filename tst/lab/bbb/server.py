@@ -11,13 +11,13 @@ class Server(Thread):
         self.app=Flask(__name__)
         Thread.__init__(self)
         self.buffer = []
-        self.timestamps = []
         self.toffset = time.time()
 
     def queue(self, M, W, B, Q):
         ts = time.time() - self.toffset
         self.buffer.append(str(ts)+"<br/>"+repr(M)+"<br/>"+repr(W)+"<br/>"+repr(B)+"<br/>"+repr(Q.vec()))
-        self.timestamps.append(ts)
+        if len(self.buffer) > 30:
+            self.buffer.pop(0)
 
     def index(self):
         return '<br/><br/>'.join(self.buffer)
