@@ -1,21 +1,27 @@
+import sys
+import os
+sys.path.append(os.path.join(*['..']*3))
+from src.scao.quaternion import Quaternion
 from flask import Flask
+import time
 from threading import Thread
 
-class Server:
-    def __init__(self, Thread):
-        Thread.__init__()
+class Server(Thread):
+    def __init__(self):
         self.app=Flask(__name__)
+        Thread.__init__(self)
         self.buffer = []
         self.timestamps = []
+        self.toffset = time.time()
 
     def queue(self, M, W, B, Q):
-        ts = time.time()
-        self.buffer.append(str(ts)+"<br/>"+repr(runner.M)+"<br/>"+repr(W)+"<br/>"+repr(runner.B)+"<br/>"+repr(Q.vec()))
+        ts = time.time() - self.toffset
+        self.buffer.append(str(ts)+"<br/>"+repr(M)+"<br/>"+repr(W)+"<br/>"+repr(B)+"<br/>"+repr(Q.vec()))
         self.timestamps.append(ts)
 
-    @self.app.route('/')
-    def index():
+    def index(self):
         return '<br/><br/>'.join(self.buffer)
 
     def run(self):
-        app.run(host='0.0.0.0')
+        self.app.add_url_rule('/', 'index', lambda: tst.index())
+        self.app.run(host='0.0.0.0')
