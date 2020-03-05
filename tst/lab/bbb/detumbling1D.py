@@ -4,15 +4,15 @@ sys.path.append(os.path.join(*['..']*3))
 from math import *
 import time
 import numpy as np
-from scao.quaternion import Quaternion
-from scao.scao import SCAO
-from scao.stabAlgs import PIDRW, PIDMT
+from src.scao.quaternion import Quaternion
+from src.scao.scao import SCAO
+from src.scao.stabAlgs import PIDRW, PIDMT
 import rcpy.mpu9250 as mpu9250
 import rcpy.motor as motor
 from flask import Flask
 from threading import Thread
 import logging
-from hardware.hardwares import Hardware
+from src.hardware.hardwares import Hardware
 
 
 log = logging.getLogger('werkzeug')
