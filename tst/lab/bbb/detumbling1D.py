@@ -1,6 +1,6 @@
 import sys
-sys.path.append('..')
 import os
+sys.path.append(os.path.join(*['..']*3))
 from math import *
 import time
 import numpy as np

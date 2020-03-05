@@ -1,6 +1,6 @@
 import sys
-sys.path.append('..')
 import os
+sys.path.append(os.path.join(*['..']*2))
 import shutil
 import vpython as vp
 from math import *
