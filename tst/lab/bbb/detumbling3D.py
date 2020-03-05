@@ -90,7 +90,7 @@ class Runner(Thread):
                 dw, self.M = stab.getCommand(Qt) #dans Rv
                 self.U, self.M = hardW.getRealCommand(dw, self.M)
 
-                for nomot, mot in mots:
+                for nomot, mot in enumerate(mots):
                     mot.set(-self.U[nomot][0]/U_max)
                 time.sleep(.1)
             nbit += 1
