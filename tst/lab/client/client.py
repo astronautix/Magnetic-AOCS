@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.join(*['..']*3))
 import time
-from scao.quaternion import Quaternion
+from src.scao.quaternion import Quaternion
 import numpy as np
 from numpy import array
 import requests

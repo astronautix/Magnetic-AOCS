@@ -23,5 +23,5 @@ class Server(Thread):
         return '<br/><br/>'.join(self.buffer)
 
     def run(self):
-        self.app.add_url_rule('/', 'index', lambda: tst.index())
+        self.app.add_url_rule('/', 'index', lambda: self.index())
         self.app.run(host='0.0.0.0')
