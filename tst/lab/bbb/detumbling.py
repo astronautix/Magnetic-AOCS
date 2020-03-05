@@ -33,7 +33,7 @@ SCAOratio = 0
 RW_P = 3
 RW_dP = 2
 RW_D = 3
-MT_P = 0
+MT_P = 5000
 MT_dP = 0
 MT_D = 50000
 
@@ -52,6 +52,7 @@ mgt_parameters = r_coil, r_wire, n_windings, mu_rel, U_max
 stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMT(MT_P,MT_dP,MT_D),SCAOratio,I,J) #stabilisateur
 hardW = Hardware(mgt_parameters, 'custom coil')  #hardware (bobines custom)
 
+# set as target attitude the initial attitude
 state = imu.read()
 Qt = Quaternion(*state['quat'])
 
@@ -96,7 +97,7 @@ class Runner(Thread):
                 for nomot, mot in enumerate(mots):
                     mot.set(-self.U[nomot][0]/U_max)
                 time.sleep(.1)
-            self.server.queue(self.M, self.W, self.B, self.Q, self.Q*Qt.inv())
+            self.server.queue(self.M, self.W, self.B, self.Q*Qt.inv())
             nbit += 1
 
 runner = Runner()
