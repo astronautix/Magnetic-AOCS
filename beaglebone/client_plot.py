@@ -88,28 +88,3 @@ def animate(i, Qs, ts):
 # Set up plot to call animate() function periodically
 ani = animation.FuncAnimation(fig, animate, fargs=(ts, Qs), interval=100)
 plt.show()
-
-"""
-while True:
-    try:
-        response = requests.get('http://192.168.8.1:5000', verify=False, timeout=0.5)
-        M, W, B, Q = response.text.split("<br/>")
-        Q = Quaternion(*eval(Q)[:,0])
-        M = eval(M)
-        W = eval(W)
-        B = eval(B)
-
-        Ws.append(W)
-        Qs.append(Q)
-        t.append(time.time())
-
-        # Actualisation de l'affichage graphique
-        b_vector.axis = 10*vp.vector(*B[:,0]/np.linalg.norm(B))
-        satellite.axis = vp.vector(*Q.V2R(array([[1],[0],[0]]))[:,0])
-        satellite.up = vp.vector(*Q.V2R(array([[0],[0],[1]]))[:,0])
-    except requests.exceptions.ConnectionError:
-        print('[' + str(int(time.time())) + "] Did not reached server")
-    except requests.exceptions.ReadTimeout:
-        print('[' + str(int(time.time())) + "] Did not reached server")
-    time.sleep(dt)
-"""
