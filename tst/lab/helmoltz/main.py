@@ -1,5 +1,6 @@
 from helmoltz import *
-
+import time
+from math import sin
 #on crée les objets représentant chaque générateurs en indiquant leur ports USB
 #sur linux on les découvre avec la commande 'ls /dev/ttyUSB*'
 gen1 = GPD3303S("/dev/ttyUSB0")
@@ -31,10 +32,13 @@ gen3D=Generator3D(
 #on définit alors le champ que l'on veut dans les bobines en indiquant:
 # - quelles sont les caractéistiques des bobines
 # - quels channels controlent quelles bobines
-generate_B(
-    Q_("150uT"),
-    Q_("150uT"),
-    Q_("150uT"),
-    helmholtz_coil_lpp,
-    gen3D
-)
+while 1:
+
+    generate_B(
+        Q_(str(150*sin(2*3.14*.1*time.time()))+"uT"),
+        Q_(str(150*sin(2*3.14*.13*time.time()))+"uT"),
+        Q_(str(150*sin(2*3.14*.12*time.time()))+"uT"),
+        helmholtz_coil_lpp,
+        gen3D
+    )
+    time.sleep(1)
