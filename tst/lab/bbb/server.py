@@ -13,7 +13,7 @@ class Server(Thread):
         self.buffer = []
         self.toffset = time.time()
 
-    def queue(self, M, W, B, Q, Qr):
+    def queue(self, M, W, B, Q):
         ts = time.time() - self.toffset
         self.buffer.append(str(ts)+"<br/>"+repr(M)+"<br/>"+repr(W)+"<br/>"+repr(B)+"<br/>"+repr(Q.vec())+"<br/>"+repr(Qr.vec()))
         if len(self.buffer) > 30:
