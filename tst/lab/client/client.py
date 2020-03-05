@@ -31,20 +31,22 @@ b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(0,0,0), shaftwidt
 
 
 Ws = []
-t = []
+ts = []
 
 
 while True:
     try:
         response = requests.get('http://192.168.8.1:5000', verify=False, timeout=0.5)
-        M, W, B, Q = response.text.split("<br/>")
+        t, M, W, B, Q = response.text.split("<br/>")
+        print(t)
+        t = int(t)
         Q = Quaternion(*eval(Q)[:,0])
         M = eval(M)
         W = eval(W)
         B = eval(B)
 
         Ws.append(W)
-        t.append(time.time())
+        ts.append(t)
 
         # Actualisation de l'affichage graphique
         b_vector.axis = 10*vp.vector(*B[:,0]/np.linalg.norm(B))

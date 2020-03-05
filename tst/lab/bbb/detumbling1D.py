@@ -103,6 +103,6 @@ def index():
     Q = Quaternion(*state['quat'])
     W = Q.V2R(np.array([[i*pi/360] for i in state['gyro']]))
 
-    return repr(runner.M)+"<br/>"+repr(W)+"<br/>"+repr(runner.B)+"<br/>"+repr(Q.vec())
+    return time.time()+"<br/>"+repr(runner.M)+"<br/>"+repr(W)+"<br/>"+repr(runner.B)+"<br/>"+repr(Q.vec())
 
 app.run(host='0.0.0.0')
