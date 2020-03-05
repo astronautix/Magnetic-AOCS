@@ -38,7 +38,7 @@ b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(0,0,0), shaftwidt
 Ws = []
 Wnorms = []
 Qs = []
-t, ts, nbr_secondes = [], [], 0
+ts, nbr_secondes = [], 0
 Wmax = 0
 
 #######################################
@@ -53,25 +53,29 @@ def animate(i, Qs, ts):
     nbr_secondes += dt
     try:
         # Read attitude
-        response = requests.get('http://192.168.8.1:5000', verify=False, timeout=0.5)
-        if response.text != "":
-            temps, M, W, B, Q = response.text.split("<br/><br/>")[-1].split("<br/>")
-            temps = eval(temps)
-            Q = Quaternion(*eval(Q)[:,0])
-            M = eval(M)
-            W = eval(W)
-            B = eval(B)
+        response_raw = requests.get('http://192.168.8.1:5000', verify=False, timeout=0.5)
+        if response_raw.text != "":
+            for line in response_raw.text.split("<br/><br/>"):
+                temps, M, W, B, Q = line.split("<br/>")
+                temps = eval(temps)
 
-            # add Q and t_ to lists
-            Ws.append(W)
-            Wnorms.append(np.linalg.norm(W))
-            Qs.append(Q.vec())
-            t.append(time.time())
-            ts.append(temps)
+                if len(ts) != 0:
+                    if temps <= ts[-1]:
+                        continue
 
-            #update dynamic Wmax
-            Wmax = max(Wmax, Wnorms[-1])
+                Q = Quaternion(*eval(Q)[:,0])
+                M = eval(M)
+                W = eval(W)
+                B = eval(B)
 
+                # add Q and t_ to lists
+                Ws.append(W)
+                Wnorms.append(np.linalg.norm(W))
+                Qs.append(Q.vec())
+                ts.append(temps)
+
+                #update dynamic Wmax
+                Wmax = max(Wmax, Wnorms[-1])
 
             plt.clf()
 
