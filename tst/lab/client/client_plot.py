@@ -1,7 +1,7 @@
 import sys
-sys.path.append('..')
+sys.path.append('..\..\..')
 import time
-from scao.quaternion import Quaternion
+from src.scao.quaternion import Quaternion
 import numpy as np
 from numpy import array
 import requests
