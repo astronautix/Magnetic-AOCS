@@ -9,7 +9,6 @@ from src.scao.scao import SCAO
 from src.scao.stabAlgs import PIDRW, PIDMT
 import rcpy.mpu9250 as mpu9250
 import rcpy.motor as motor
-from flask import Flask
 from threading import Thread
 import logging
 from src.hardware.hardwares import Hardware
@@ -61,8 +60,10 @@ class Runner(Thread):
         self.W = np.array([[0],[0],[0]])
         self.B = np.array([[0],[0],[0]])
         self.Q = Quaternion(1,0,0,0)
+        self.server = Server()
 
     def run(self):
+        self.server.start()
         nbitBeforeMagMeasure = round(1/0.1)
         nbit = 0
         while True:
@@ -89,20 +90,8 @@ class Runner(Thread):
 
                 mot.set(max(-1,min(-self.U[1][0]/U_max,1)))
                 time.sleep(.1)
+            self.server.queue(self.M, self.W, self.B, self.Q)
             nbit += 1
 
 runner = Runner()
 runner.start()
-
-app=Flask(__name__)
-
-@app.route('/')
-def index():
-    state = imu.read()
-
-    Q = Quaternion(*state['quat'])
-    W = Q.V2R(np.array([[i*pi/360] for i in state['gyro']]))
-
-    return str(time.time())+"<br/>"+repr(runner.M)+"<br/>"+repr(W)+"<br/>"+repr(runner.B)+"<br/>"+repr(Q.vec())
-
-app.run(host='0.0.0.0')

@@ -1,5 +1,6 @@
 import sys
-sys.path.append('..\..\..')
+import os
+sys.path.append(os.path.join(*['..']*3))
 import time
 from src.scao.quaternion import Quaternion
 import numpy as np
