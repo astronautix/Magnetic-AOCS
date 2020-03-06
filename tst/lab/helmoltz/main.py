@@ -32,11 +32,13 @@ gen3D=Generator3D(
 
 #on définit alors le champ que l'on veut dans les bobines en indiquant:
 # - quelles sont les caractéistiques des bobines
-# - quels channels controlent quelles bobines
+# - quels channels controlent quelles bobines4
+theta = 2*pi*random.random()
+phi = 2*pi*random.random()
 while 1:
     try:
-        theta = 2*pi*random.random()
-        phi = 2*pi*random.random()
+        theta += 45/180*pi*(2*random.random()-1)
+        phi += 45/180*pi*(2*random.random()-1)
         B0 = 150
         Bxy = B0*cos(phi)
         Bx = Bxy*cos(theta)
