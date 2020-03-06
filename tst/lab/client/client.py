@@ -38,10 +38,10 @@ if vpython_display:
     b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(0,0,0), shaftwidth=0.5, color=vp.vector(1,1,1))
 
 
-Ws, Qs, Cs = [], [], []
-Wnorms, Cnorms = [], []
+Ws, Qs, Cs, Ms = [], [], [], []
+Wnorms, Cnorms, Mnorms = [], [], []
 ts, nbr_secondes = [], 0
-Wmax, Cmax = 0, 0
+Wmax, Cmax, Mmax = 0, 0, 0
 t0 = 0
 
 #######################################
@@ -51,7 +51,7 @@ fig = plt.figure()
 
 
 def animate(i, Qs, ts):
-    global nbr_secondes, dt, Wmax, Cmax, t0
+    global nbr_secondes, dt, Wmax, Cmax, t0, Mmax
     # required for dezooming
     nbr_secondes += dt
     try:
@@ -75,14 +75,16 @@ def animate(i, Qs, ts):
                 M = eval(M)
                 W = eval(W)
                 B = eval(B)
+                C = np.cross(M, B, axisa=0, axisb=0,axisc=0)
 
                 # add values to lists
                 Ws.append(W)
-                Wnorms.append(np.linalg.norm(W))
                 Qs.append(Q.vec())
-                C = np.cross(M, B, axisa=0, axisb=0,axisc=0)
                 Cs.append(C)
+
+                Wnorms.append(np.linalg.norm(W))
                 Cnorms.append(np.linalg.norm(C))
+
                 ts.append(temps)
 
 
@@ -91,12 +93,13 @@ def animate(i, Qs, ts):
                 #update dynamic Wmax, Cmax
                 Wmax = max(Wmax, Wnorms[-1])
                 Cmax = max(Cmax, Cnorms[-1])
+                Mmax = max(Mmax, Mnorms[-1])
 
             #clear plots
             plt.clf()
 
             ### Draw quaternion
-            plt.subplot(3,1,1)
+            plt.subplot(2,2,1)
                 # vecteur (nuances de bleu)
             plt.plot(ts, np.array(Qs)[:,1][:,0], label = "$Q_{}$".format(1), c = "#87CEFA")
             plt.plot(ts, np.array(Qs)[:,2][:,0], label = "$Q_{}$".format(2), c = "#87CEEB")
@@ -113,7 +116,7 @@ def animate(i, Qs, ts):
             plt.xlim(right = max(30, ts[-1])+int(nbr_secondes))
 
             ### Draw W
-            plt.subplot(3,1,2)
+            plt.subplot(2,2,2)
 
             plt.plot(ts, np.array(Ws)[:,0][:,0], label = "$W_{}$".format(0), c = "#87CEFA")
             plt.plot(ts, np.array(Ws)[:,1][:,0], label = "$W_{}$".format(1), c = "#87CEEB")
@@ -129,7 +132,7 @@ def animate(i, Qs, ts):
 
 
             ### Draw C=MxB
-            plt.subplot(3,1,3)
+            plt.subplot(2,2,3)
 
             plt.plot(ts, np.array(Cs)[:,0][:,0], label = "$C_{}$".format(0), c = "#87CEFA")
             plt.plot(ts, np.array(Cs)[:,1][:,0], label = "$C_{}$".format(1), c = "#87CEEB")
@@ -142,6 +145,22 @@ def animate(i, Qs, ts):
             plt.xlabel('Time (s)')
             plt.legend()
             plt.ylim((-Cmax*1.05,Cmax*1.05))
+            plt.xlim(right = max(30, ts[-1])+int(nbr_secondes))
+
+            ### Draw M
+            plt.subplot(2,2,4)
+
+            plt.plot(ts, np.array(Ms)[:,0][:,0], label = "$M_{}$".format(0), c = "#87CEFA")
+            plt.plot(ts, np.array(Ms)[:,1][:,0], label = "$M_{}$".format(1), c = "#87CEEB")
+            plt.plot(ts, np.array(Ms)[:,2][:,0], label = "$M_{}$".format(2), c = "#00BFFF")
+
+            plt.plot(ts, np.array(Mnorms), label = "$|M|$", c = 'r')
+                # Format plot
+            plt.xticks(rotation=45, ha='right')
+            plt.ylabel('Momentum')
+            plt.xlabel('Time (s)')
+            plt.legend()
+            plt.ylim((-Mmax*1.05,Mmax*1.05))
             plt.xlim(right = max(30, ts[-1])+int(nbr_secondes))
 
             if vpython_display:

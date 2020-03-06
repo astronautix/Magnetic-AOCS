@@ -1,4 +1,4 @@
-from src.hardware.magnetorquer import Magnetorquer
+from hardware.magnetorquer import Magnetorquer
 import numpy as np
 
 class Hardware:
