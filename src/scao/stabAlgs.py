@@ -23,7 +23,7 @@ def PIDMT(P, dP, D):
         return M
     return res
 
-def PIDMTI(P, dP, D, I, dt):
+def PIDMTI(P, dP, D, CI, dt):
     Qs = []
     def res(Q,W,Qt,B,I):
         Qs.append(Q.vec())
@@ -33,7 +33,7 @@ def PIDMTI(P, dP, D, I, dt):
         Qintr = Qint*Qt.inv()
         Qr = Q*Qt.inv()
         dynamicalP = P # P/(1+np.linalg.norm(W))**dP
-        u = Q.R2V(dynamicalP*Qr.axialPart() + D*W + I*Qintr.axialPart())
+        u = Q.R2V(dynamicalP*Qr.axialPart() + D*W + CI*Qintr.axialPart())
         Bb = Q.R2V(B)
         M = np.cross(u,Bb,axisa=0,axisb=0,axisc=0)
         return M
