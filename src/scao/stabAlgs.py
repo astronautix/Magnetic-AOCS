@@ -29,7 +29,7 @@ def PIDMTI(P, dP, D, CI, dt):
         Qs.append(Q.vec())
         subQs = Qs[-300:]
         Qint = sum(subQs)*dt/len(subQs)
-        Qint = Quaternion(*Qint)
+        Qint = Quaternion(*Qint[:,0])
         Qintr = Qint*Qt.inv()
         Qr = Q*Qt.inv()
         dynamicalP = P # P/(1+np.linalg.norm(W))**dP

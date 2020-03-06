@@ -34,10 +34,10 @@ SCAOratio = 0
 RW_P = 3
 RW_dP = 2
 RW_D = 3
-MT_P = 500000
+MT_P = 50000000
 MT_dP = 0 #n'a pas d'effet
-MT_D = 500000
-MT_I = 200000
+MT_D = 50000000
+MT_I = 0
 
 #####
 # paramètres hardware
@@ -93,7 +93,6 @@ class Runner(Thread):
                 # Prise de la commande de stabilisation
                 dw, self.M = stab.getCommand(Qt) #dans Rv
                 self.U, self.M = hardW.getRealCommand(dw, self.M)
-
                 for nomot, mot in enumerate(mots):
                     mot.set(-self.U[nomot][0]/U_max)
                 time.sleep(dt)
