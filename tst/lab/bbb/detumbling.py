@@ -6,7 +6,7 @@ import time
 import numpy as np
 from src.scao.quaternion import Quaternion
 from src.scao.scao import SCAO
-from src.scao.stabAlgs import PIDRW, PIDMT
+from src.scao.stabAlgs import PIDRW, PIDMTI
 import rcpy.mpu9250 as mpu9250
 import rcpy.motor as motor
 from flask import Flask
@@ -25,6 +25,7 @@ mots = [motor.Motor(1), motor.Motor(2), motor.Motor(3)] #x,y,z
 # Algorithmes de stabilisation
 
 lx,ly,lz = 0.1,0.1,0.1 #longueur du satellite selon les axes x,y,z
+dt = .1 #pas de temps entre deux loops
 m = 1 #masse du satellite
 M = np.array([[0.],[0.],[0.]]) # vecteur du moment magnétique des bobines
 I = np.diag((m*(ly**2+lz**2)/3,m*(lx**2+lz**2)/3,m*(lx**2+ly**2)/3)) # Tenseur inertie du satellite
@@ -33,9 +34,10 @@ SCAOratio = 0
 RW_P = 3
 RW_dP = 2
 RW_D = 3
-MT_P = 5000
-MT_dP = 0
-MT_D = 50000
+MT_P = 500000
+MT_dP = 0 #n'a pas d'effet
+MT_D = 500000
+MT_I = 200000
 
 #####
 # paramètres hardware
@@ -49,7 +51,7 @@ J = 1 # moment d'inertie des RW
 mgt_parameters = r_coil, r_wire, n_windings, mu_rel, U_max
 #####
 
-stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMT(MT_P,MT_dP,MT_D),SCAOratio,I,J) #stabilisateur
+stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMTI(MT_P,MT_dP,MT_D,MT_I,dt),SCAOratio,I,J) #stabilisateur
 hardW = Hardware(mgt_parameters, 'custom coil')  #hardware (bobines custom)
 
 # set as target attitude the initial attitude
@@ -68,19 +70,17 @@ class Runner(Thread):
 
     def run(self):
         self.server.start()
-        nbitBeforeMagMeasure = round(1/0.1)
+        nbitBeforeMagMeasure = round(1/dt)
         nbit = 0
         while True:
             if nbit%nbitBeforeMagMeasure == 0:
                 for mot in mots:
                     mot.set(0)
-                mot.set(0)
-                time.sleep(.1)
+                time.sleep(dt)
                 state = imu.read()
                 self.Q = Quaternion(*state['quat'])
                 self.B = self.Q.V2R(np.array([[i*10**-6] for i in state['mag']]))
                 stab.setMagneticField(self.B)
-
             else:
                 state = imu.read()
                 self.Q = Quaternion(*state['quat'])
@@ -96,7 +96,7 @@ class Runner(Thread):
 
                 for nomot, mot in enumerate(mots):
                     mot.set(-self.U[nomot][0]/U_max)
-                time.sleep(.1)
+                time.sleep(dt)
             self.server.queue(self.M, self.W, self.B, self.Q*Qt.inv())
             nbit += 1
 
