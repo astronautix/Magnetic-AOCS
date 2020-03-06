@@ -38,10 +38,10 @@ if vpython_display:
     b_vector = vp.arrow(pos=vp.vector(-5,-5,-5), axis=10*vp.vector(0,0,0), shaftwidth=0.5, color=vp.vector(1,1,1))
 
 
-Ws, Qs, Cs, Ms = [], [], [], []
-Wnorms, Cnorms, Mnorms = [], [], []
+Ws, Qs, Cs, Ms, Bs = [], [], [], [], []
+Wnorms, Cnorms, Mnorms, Bnorms = [], [], [], []
 ts, nbr_secondes = [], 0
-Wmax, Cmax, Mmax = 0, 0, 0
+Wmax, Cmax, Mmax, Bmax = 0, 0, 0, 0
 t0 = 0
 
 #######################################
@@ -51,7 +51,7 @@ fig = plt.figure()
 
 
 def animate(i, Qs, ts):
-    global nbr_secondes, dt, Wmax, Cmax, t0, Mmax
+    global nbr_secondes, dt, Wmax, Cmax, t0, Mmax, Bmax
     # required for dezooming
     nbr_secondes += dt
     try:
@@ -82,10 +82,12 @@ def animate(i, Qs, ts):
                 Qs.append(Q.vec())
                 Cs.append(C)
                 Ms.append(M)
+                Bs.append(B)
 
                 Wnorms.append(np.linalg.norm(W))
                 Cnorms.append(np.linalg.norm(C))
                 Mnorms.append(np.linalg.norm(M))
+                Bnorms.append(np.linalg.norm(B))
 
                 ts.append(temps)
 
@@ -96,6 +98,7 @@ def animate(i, Qs, ts):
                 Wmax = max(Wmax, Wnorms[-1])
                 Cmax = max(Cmax, Cnorms[-1])
                 Mmax = max(Mmax, Mnorms[-1])
+                Bmax = max(Bmax, Bnorms[-1])
 
             #clear plots
             plt.clf()
@@ -111,15 +114,16 @@ def animate(i, Qs, ts):
 
                 # Format plot
             plt.xticks(rotation=45, ha='right')
-            plt.title('Attitude quaternion and angular speed over time')
+            plt.title('Attitude quaternion and magnetic torque over time')
             plt.ylabel('Attitude')
             plt.legend()
-            plt.ylim((-1,1))
+            plt.ylim((-1.05,1.05))
             plt.xlim(right = max(30, ts[-1])+int(nbr_secondes))
 
             ### Draw W
             plt.subplot(2,2,2)
 
+            plt.title('Speed and magnetic field over time')
             plt.plot(ts, np.array(Ws)[:,0][:,0], label = "$W_{}$".format(0), c = "#87CEFA")
             plt.plot(ts, np.array(Ws)[:,1][:,0], label = "$W_{}$".format(1), c = "#87CEEB")
             plt.plot(ts, np.array(Ws)[:,2][:,0], label = "$W_{}$".format(2), c = "#00BFFF")
@@ -149,20 +153,20 @@ def animate(i, Qs, ts):
             plt.ylim((-Cmax*1.05,Cmax*1.05))
             plt.xlim(right = max(30, ts[-1])+int(nbr_secondes))
 
-            ### Draw M
+            ### Draw B
             plt.subplot(2,2,4)
 
-            plt.plot(ts, np.array(Ms)[:,0][:,0], label = "$M_{}$".format(0), c = "#87CEFA")
-            plt.plot(ts, np.array(Ms)[:,1][:,0], label = "$M_{}$".format(1), c = "#87CEEB")
-            plt.plot(ts, np.array(Ms)[:,2][:,0], label = "$M_{}$".format(2), c = "#00BFFF")
+            plt.plot(ts, np.array(Bs)[:,0][:,0], label = "$B_{}$".format(0), c = "#87CEFA")
+            plt.plot(ts, np.array(Bs)[:,1][:,0], label = "$B_{}$".format(1), c = "#87CEEB")
+            plt.plot(ts, np.array(Bs)[:,2][:,0], label = "$B_{}$".format(2), c = "#00BFFF")
 
-            plt.plot(ts, np.array(Mnorms), label = "$|M|$", c = 'r')
+            plt.plot(ts, np.array(Bnorms), label = "$|B|$", c = 'r')
                 # Format plot
             plt.xticks(rotation=45, ha='right')
-            plt.ylabel('Momentum')
+            plt.ylabel('Magnetic field')
             plt.xlabel('Time (s)')
             plt.legend()
-            plt.ylim((-Mmax*1.05,Mmax*1.05))
+            plt.ylim((-Bmax*1.05,Bmax*1.05))
             plt.xlim(right = max(30, ts[-1])+int(nbr_secondes))
 
             if vpython_display:
