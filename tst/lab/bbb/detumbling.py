@@ -20,6 +20,7 @@ log.setLevel(logging.ERROR)
 
 imu = mpu9250.IMU(enable_dmp = True, dmp_sample_rate = 100, enable_magnetometer = True)
 
+rect = [-1,-1,1]
 mots = [motor.Motor(1), motor.Motor(2), motor.Motor(3)] #x,y,z
 
 # Algorithmes de stabilisation
@@ -34,9 +35,9 @@ SCAOratio = 0
 RW_P = 3
 RW_dP = 2
 RW_D = 3
-MT_P = 50000000
+MT_P = 5000
 MT_dP = 0 #n'a pas d'effet
-MT_D = 50000000
+MT_D = 15000
 MT_I = 0
 
 #####
@@ -51,7 +52,7 @@ J = 1 # moment d'inertie des RW
 mgt_parameters = r_coil, r_wire, n_windings, mu_rel, U_max
 #####
 
-stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMTI(MT_P,MT_dP,MT_D,MT_I,dt),SCAOratio,I,J) #stabilisateur
+stab = SCAO(PIDRW(RW_P,RW_dP,RW_D),PIDMTI(MT_P,MT_dP,MT_D,MT_I),SCAOratio,I,J) #stabilisateur
 hardW = Hardware(mgt_parameters, 'custom coil')  #hardware (bobines custom)
 
 # set as target attitude the initial attitude
@@ -70,7 +71,7 @@ class Runner(Thread):
 
     def run(self):
         self.server.start()
-        nbitBeforeMagMeasure = round(1/dt)
+        nbitBeforeMagMeasure = round(3)
         nbit = 0
         while True:
             if nbit%nbitBeforeMagMeasure == 0:
@@ -94,7 +95,9 @@ class Runner(Thread):
                 dw, self.M = stab.getCommand(Qt) #dans Rv
                 self.U, self.M = hardW.getRealCommand(dw, self.M)
                 for nomot, mot in enumerate(mots):
-                    mot.set(-self.U[nomot][0]/U_max)
+                    print(-self.U[nomot][0]/U_max)
+                    mot.set(rect[nomot]*self.U[nomot][0]/U_max)
+                print()
                 time.sleep(dt)
             self.server.queue(self.M, self.W, self.B, self.Q*Qt.inv())
             nbit += 1
