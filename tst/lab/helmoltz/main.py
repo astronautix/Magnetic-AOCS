@@ -34,19 +34,24 @@ gen3D=Generator3D(
 # - quelles sont les caractéistiques des bobines
 # - quels channels controlent quelles bobines
 while 1:
-    theta = 2*pi*random.random()
-    phi = 2*pi*random.random()
-    B0 = 150
-    Bxy = B0*cos(phi)
-    Bx = Bxy*cos(theta)
-    By = Bxy*sin(theta)
-    Bz = B0*sin(phi)
-    print(Bx,By,Bz)
-    generate_B(
-        Q_(str(Bx)+"uT"),
-        Q_(str(By)+"uT"),
-        Q_(str(Bz)+"uT"),
-        helmholtz_coil_lpp,
-        gen3D
-    )
-    time.sleep(5)
+    try:
+        theta = 2*pi*random.random()
+        phi = 2*pi*random.random()
+        B0 = 150
+        Bxy = B0*cos(phi)
+        Bx = Bxy*cos(theta)
+        By = Bxy*sin(theta)
+        Bz = B0*sin(phi)
+        print(Bx,By,Bz)
+        generate_B(
+            Q_(str(Bx)+"uT"),
+            Q_(str(By)+"uT"),
+            Q_(str(Bz)+"uT"),
+            helmholtz_coil_lpp,
+            gen3D
+        )
+        time.sleep(5)
+    except (KeyboardInterrupt, SystemExit):
+        gen1.out=0
+        gen2.out=0
+        raise
