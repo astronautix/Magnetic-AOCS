@@ -11,6 +11,7 @@ import matplotlib
 matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import datetime
 
 lx,ly,lz = 10,10,10 #longueur du satellit selon les axes x,y,z
 dt = 0.1
@@ -44,11 +45,31 @@ ts, nbr_secondes = [], 0
 Wmax, Cmax, Mmax, Bmax = 0, 0, 0, 0
 t0 = 0
 
+
+#### FONCTION D'AFFICHAGE
+
+def plot3and1(Ys, Ynorms, Ymax, title, variable_name, indexes):
+    plt.subplot(indexes)
+    plt.plot(ts, np.array(Ys)[:,0][:,0], label = "${}_{}$".format(variable_name,0), c = "#87CEFA")
+    plt.plot(ts, np.array(Ys)[:,1][:,0], label = "${}_{}$".format(variable_name,1), c = "#87CEEB")
+    plt.plot(ts, np.array(Ys)[:,2][:,0], label = "${}_{}$".format(variable_name,2), c = "#00BFFF")
+
+    plt.plot(ts, np.array(Ynorms), label = "$|{}|$".format(variable_name), c = 'r')
+        # Format plot
+    plt.xticks(rotation=45, ha='right')
+    plt.ylabel(title)
+    plt.xlabel('Time (s)')
+    plt.legend()
+    plt.ylim((-Ymax*1.05,Ymax*1.05))
+    plt.xlim(right = max(30, ts[-1])+int(nbr_secondes))
 #######################################
 # Initialisation graphique matplotlib #
 #######################################
 fig = plt.figure()
 
+# enregistrer fichier
+os.chdir('datas')
+filename = str(datetime.datetime.now().strftime('%H_%M_%S_%f'))+".txt"
 
 def animate(i, Qs, ts):
     global nbr_secondes, dt, Wmax, Cmax, t0, Mmax, Bmax
@@ -76,6 +97,9 @@ def animate(i, Qs, ts):
                 W = eval(W)
                 B = eval(B)
                 C = np.cross(M, B, axisa=0, axisb=0,axisc=0)
+
+                with open(filename, 'a') as f:
+                    f.write(str(temps) + '\t' + str(list(M[:,0])) + '\t' + str(list(W[:,0])) + '\t' + str(list(B[:,0])) + '\t' + str(list(Q.vec()[:,0])) + "\t" + str(list(C[:,0])) + '\n')
 
                 # add values to lists
                 Ws.append(W)
@@ -153,12 +177,13 @@ def animate(i, Qs, ts):
             plt.ylim((-Cmax*1.05,Cmax*1.05))
             plt.xlim(right = max(30, ts[-1])+int(nbr_secondes))
 
-            ### Draw B
+            #Draw B
             plt.subplot(2,2,4)
 
             plt.plot(ts, np.array(Bs)[:,0][:,0], label = "$B_{}$".format(0), c = "#87CEFA")
             plt.plot(ts, np.array(Bs)[:,1][:,0], label = "$B_{}$".format(1), c = "#87CEEB")
             plt.plot(ts, np.array(Bs)[:,2][:,0], label = "$B_{}$".format(2), c = "#00BFFF")
+
 
             plt.plot(ts, np.array(Bnorms), label = "$|B|$", c = 'r')
                 # Format plot
@@ -168,12 +193,6 @@ def animate(i, Qs, ts):
             plt.legend()
             plt.ylim((-Bmax*1.05,Bmax*1.05))
             plt.xlim(right = max(30, ts[-1])+int(nbr_secondes))
-
-            if vpython_display:
-                # Actualisation de l'affichage graphique
-                b_vector.axis = 10*vp.vector(*B[:,0]/np.linalg.norm(B))
-                satellite.axis = vp.vector(*Q.V2R(array([[1],[0],[0]]))[:,0])
-                satellite.up = vp.vector(*Q.V2R(array([[0],[0],[1]]))[:,0])
 
     except requests.exceptions.ConnectionError:
         print('[' + str(int(time.time())) + "] Did not reach server")
