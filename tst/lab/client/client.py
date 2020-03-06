@@ -81,9 +81,11 @@ def animate(i, Qs, ts):
                 Ws.append(W)
                 Qs.append(Q.vec())
                 Cs.append(C)
+                Ms.append(M)
 
                 Wnorms.append(np.linalg.norm(W))
                 Cnorms.append(np.linalg.norm(C))
+                Mnorms.append(np.linalg.norm(M))
 
                 ts.append(temps)
 
