@@ -27,7 +27,7 @@ def PIDMTI(P, dP, D, I, dt):
     Qs = []
     def res(Q,W,Qt,B,I):
         Qs.append(Q.vec())
-        subQs = Qs[-300:-1]
+        subQs = Qs[-300:]
         Qint = sum(subQs)*dt/len(subQs)
         Qint = Quaternion(*Qint)
         Qintr = Qint*Qt.inv()
