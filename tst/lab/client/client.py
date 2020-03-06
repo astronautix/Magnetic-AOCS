@@ -69,7 +69,8 @@ fig = plt.figure()
 
 # enregistrer fichier
 os.chdir('datas')
-filename = str(datetime.datetime.now().strftime('%H_%M_%S_%f'))+".txt"
+name = input('Name for datas ?\n')
+filename = str(datetime.datetime.now().strftime('%H_%M_%S_%f'))+"_"+name+"_"+".txt"
 
 def animate(i, Qs, ts):
     global nbr_secondes, dt, Wmax, Cmax, t0, Mmax, Bmax
