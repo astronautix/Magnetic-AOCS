@@ -21,7 +21,7 @@ log.setLevel(logging.ERROR)
 imu = mpu9250.IMU(enable_dmp = True, dmp_sample_rate = 100, enable_magnetometer = True)
 
 rect = [-1,-1,1]
-mots = [motor.Motor(1), motor.Motor(2), motor.Motor(3)] #x,y,z
+mots = [motor.Motor(1), motor.Motor(4), motor.Motor(3)] #Motor mapping : x,y,z
 
 # Algorithmes de stabilisation
 
