@@ -2,13 +2,29 @@ import numpy as np
 from math import acos, sqrt
 
 class Quaternion:
+    """ The quaternion class
 
+    Allows a simple use of quaternion
+    """
     def __init__(self,a,b,c,d):
+        """
+
+        :param a: q_0
+        :type a: float
+        :param b: q_1
+        :type b: float
+        :param c: q_2
+        :type c: float
+        :param d: q_3
+        :type d: float
+
+        Normalize the quaternion at initialization.
+        """
         norm = sqrt(a**2+b**2+c**2+d**2)
-        self.a = a/norm
-        self.b = b/norm
-        self.c = c/norm
-        self.d = d/norm
+        self.a = a/norm  #: first element of the Quaternion q_0
+        self.b = b/norm  #: second element of the Quaternion q_1
+        self.c = c/norm  #: third element of the Quaternion q_2
+        self.d = d/norm  #: forth element of the Quaternion q_3
         self.tmsave = None
         self.tminvsave = None
 

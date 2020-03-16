@@ -1,3 +1,11 @@
 *.pyc
 __pycache__/
 test/
+
+.idea/
+
+*.vim
+
+conf.py
+
+doc/_build/
