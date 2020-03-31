@@ -4,7 +4,10 @@ pages:
   script:
   - pip install -r requirements.txt
   - pip install sphinx
-  - sphinx-build -d html doc doc/_build
+  - ls
+  - cd doc
+  - sphinx-build -d html . _build
+  - cd ..
   - mv doc/_build/html public
   artifacts:
     paths:
