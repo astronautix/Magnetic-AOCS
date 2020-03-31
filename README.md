@@ -1,6 +1,6 @@
 # SCAO
 
-*Ce repo a été migré sur [github](https://github.com/astronautix/Magnetic-AOCS)*
+**Ce repo a été migré sur [github](https://github.com/astronautix/Magnetic-AOCS)**
 
 ## Installation
 ```bash
