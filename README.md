@@ -1,5 +1,7 @@
 # SCAO
 
+**Ce repo a été migré sur [github](https://github.com/astronautix/Magnetic-AOCS)**
+
 ## Installation
 ```bash
 pip3 install -r requirements.txt

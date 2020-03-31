@@ -1,0 +1,16 @@
+image: python:3.7-slim
+
+pages:
+  script:
+  - pip install -r requirements.txt
+  - pip install sphinx
+  - ls
+  - cd doc
+  - sphinx-build -d html . _build
+  - cd ..
+  - mv doc/_build/html public
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
