@@ -19,3 +19,5 @@ pip3 install -r requirements.txt
     - `bbb` : Algorithmes qui tournent sur la BeagleBone Blue (penser à installer les dépendances dans `tst/lab/bbb/requirements.txt`)
     - `client` : Visualisation et plotting de l'état de la BeagleBone
     - `helmoltz` : Contrôle des bobines de helomotz du LPP
+    
+ ## Conclusion
